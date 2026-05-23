@@ -25,38 +25,28 @@ export default function PlayerDashboard() {
   };
 
   const fetchDashboardData = async () => {
-    console.log('[DEBUG] fetchDashboardData started');
     try {
-      console.log('[DEBUG] Fetching /api/auth/me...');
       const authRes = await fetch('/api/auth/me');
-      console.log('[DEBUG] /api/auth/me status:', authRes.status);
       const authData = await authRes.json();
-      console.log('[DEBUG] /api/auth/me data:', authData);
       
       if (!authData.user) {
-        console.log('[DEBUG] No user found, redirecting to /login...');
         router.push('/login');
         return;
       }
       setUser(authData.user);
 
-      console.log('[DEBUG] Fetching /api/matches...');
       const matchesRes = await fetch('/api/matches');
-      console.log('[DEBUG] /api/matches status:', matchesRes.status);
       const matchesData = await matchesRes.json();
-      console.log('[DEBUG] /api/matches data:', matchesData);
       setMatches(matchesData.matches || []);
     } catch (error) {
-      console.error('[DEBUG] Error fetching dashboard data:', error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
-      console.log('[DEBUG] fetchDashboardData finally called, setting loading false');
       setLoading(false);
     }
   };
 
   // Establish Pusher Channels connection for true push stream live updates
   useEffect(() => {
-    console.log('[DEBUG] PlayerDashboard useEffect mounted');
     fetchDashboardData();
 
     let pusher;
@@ -134,11 +124,10 @@ export default function PlayerDashboard() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#060913', color: 'var(--text-main)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid rgba(16, 185, 129, 0.2)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '18px', color: 'var(--text-muted)' }}>Loading Cricket Portal...</p>
-          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <div className="loading-spinner" />
+          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '16px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Loading Cricket Portal...</p>
         </div>
       </div>
     );
@@ -150,8 +139,9 @@ export default function PlayerDashboard() {
     <div>
       {/* Navbar Header */}
       <nav className="navbar">
-        <div className="nav-brand" style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
-          <span>🏏</span> Cricket Club
+        <div className="nav-brand" onClick={() => router.push('/')}>
+          <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+          Curius Cricket
         </div>
         <div className="nav-links">
           {user && (
@@ -554,12 +544,12 @@ export default function PlayerDashboard() {
 
         {/* Club Intro Header */}
         <div className="glass-card mb-30 p-30" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', background: 'var(--color-primary-glow)', borderRadius: '50%', filter: 'blur(80px)', zIndex: 0 }} />
+          <div className="accent-glow" style={{ top: '-50px', right: '-50px' }} />
           
-          <h1 style={{ fontSize: '36px', color: 'white', marginBottom: '8px', zIndex: 1, position: 'relative' }}>
+          <h1 style={{ fontSize: '32px', color: 'white', marginBottom: '8px', zIndex: 1, position: 'relative' }}>
             Club Schedules & Attendance
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '16px', zIndex: 1, position: 'relative' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '15px', zIndex: 1, position: 'relative' }}>
             Verify your squad attendance, submit Yes/No RSVPs, and track match ground fee divisions dynamically based on attendees!
           </p>
 
@@ -572,10 +562,10 @@ export default function PlayerDashboard() {
 
         {/* Matches Feed Grid */}
         {matches.length === 0 ? (
-          <div className="glass-card text-center p-30" style={{ color: 'var(--text-muted)' }}>
-            <span style={{ fontSize: '48px' }}>🏏</span>
-            <h2 style={{ fontSize: '20px', color: 'white', marginTop: '10px', marginBottom: '8px' }}>No Scheduled Matches Yet</h2>
-            <p>Wait for an email broadcast or admin scheduling updates!</p>
+          <div className="glass-card empty-state">
+            <div className="empty-state-icon">🏏</div>
+            <h2 style={{ fontSize: '20px', color: 'white' }}>No Scheduled Matches Yet</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Wait for an email broadcast or admin scheduling updates!</p>
           </div>
         ) : (
           <div className="grid-2">

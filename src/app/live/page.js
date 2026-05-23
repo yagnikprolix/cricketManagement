@@ -196,11 +196,10 @@ function LiveStadiumContent() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#060913', color: 'var(--text-main)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid rgba(16, 185, 129, 0.2)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '18px', color: 'var(--text-muted)' }}>Entering Stadium Hub...</p>
-          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <div className="loading-spinner" />
+          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '16px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Entering Stadium Hub...</p>
         </div>
       </div>
     );
@@ -211,7 +210,7 @@ function LiveStadiumContent() {
     return (
       <div style={{ background: '#060913', minHeight: '100vh', color: 'var(--text-main)', display: 'flex', flexDirection: 'column' }}>
         <nav className="navbar">
-          <div className="nav-brand"><span>🏏</span> Live Stadium Portal</div>
+          <div className="nav-brand"><img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Live Stadium Portal</div>
           <div className="nav-links">
             <button onClick={() => router.push('/')} className="btn btn-secondary">Back to Dashboard</button>
           </div>
@@ -301,7 +300,7 @@ function LiveStadiumContent() {
       
       <nav className="navbar">
         <div className="nav-brand">
-          <span>🏏</span> stadium live matchcast
+          <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Stadium Live Matchcast
         </div>
         <div className="nav-links">
           {user && <span className="user-badge" style={{ fontSize: '11px' }}>Attending: {user.name}</span>}

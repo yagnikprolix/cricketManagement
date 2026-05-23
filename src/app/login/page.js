@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -73,75 +74,139 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '24px' }}>
-      <div className="glass-card" style={{ width: '100%', maxWidth: '450px', padding: '40px' }}>
+    <div className="login-wrapper">
+      <div className="glass-card login-card">
         
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '28px', color: 'var(--color-primary)', letterSpacing: '0.5px' }}>
-            🏏 CRICKET CLUB
-          </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '5px' }}>
-            {isRegister ? 'Register your account to RSVP' : 'Login to view schedules & RSVPs'}
+        {/* Logo & Brand Section */}
+        <div className="login-logo-section">
+          <div className="login-logo-icon">
+            <img src="/curius-logo.png" alt="Curius Cricket Club" />
+          </div>
+          <h1 className="login-brand-name">CURIUS</h1>
+          <p className="login-tagline">
+            {isRegister ? 'Create your account to join the squad' : 'Sign in to your cricket club portal'}
           </p>
+          <div className="login-divider" />
         </div>
 
+        {/* Error Alert */}
         {error && (
-          <div style={{ padding: '12px 16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', borderRadius: '8px', fontSize: '14px', marginBottom: '20px', fontWeight: '500' }}>
-            ⚠️ {error}
+          <div className="login-alert login-alert-error">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            {error}
           </div>
         )}
 
+        {/* Success Alert */}
         {success && (
-          <div style={{ padding: '12px 16px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', color: 'var(--color-primary)', borderRadius: '8px', fontSize: '14px', marginBottom: '20px', fontWeight: '500' }}>
-            ✅ {success}
+          <div className="login-alert login-alert-success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            {success}
           </div>
         )}
 
+        {/* Login Form */}
         <form onSubmit={handleSubmit}>
           {isRegister && (
             <div className="form-group">
-              <label className="form-label">Full Name</label>
+              <label className="form-label" htmlFor="login-name">Full Name</label>
               <input
+                id="login-name"
                 type="text"
                 placeholder="Enter your name"
                 className="form-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                autoComplete="name"
               />
             </div>
           )}
 
           <div className="form-group">
-            <label className="form-label">Email Address</label>
+            <label className="form-label" htmlFor="login-email">Email Address</label>
             <input
+              id="login-email"
               type="email"
               placeholder="name@example.com"
               className="form-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
           </div>
 
-          <div className="form-group" style={{ marginBottom: '30px' }}>
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              className="form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+          <div className="form-group" style={{ marginBottom: '28px' }}>
+            <label className="form-label" htmlFor="login-password">Password</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                className="form-input"
+                style={{ width: '100%', paddingRight: '44px' }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete={isRegister ? 'new-password' : 'current-password'}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  transition: 'color 0.2s ease',
+                }}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Processing...' : isRegister ? 'Register & Join' : 'Sign In'}
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            style={{ width: '100%', padding: '12px 24px', fontSize: '15px' }} 
+            disabled={loading}
+            id="login-submit-btn"
+          >
+            {loading ? (
+              <>
+                <span className="loading-spinner" style={{ width: '18px', height: '18px', borderWidth: '2px' }} />
+                Processing...
+              </>
+            ) : isRegister ? 'Create Account' : 'Sign In'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '14px', color: 'var(--text-muted)' }}>
+        {/* Toggle Register/Login */}
+        <div className="login-footer">
           {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
             onClick={() => {
@@ -149,11 +214,16 @@ export default function LoginPage() {
               setError('');
               setSuccess('');
             }}
-            style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontWeight: '700', padding: '0 4px', textDecoration: 'underline' }}
+            className="login-footer-toggle"
           >
-            {isRegister ? 'Login here' : 'Sign up now'}
+            {isRegister ? 'Sign in here' : 'Create account'}
           </button>
         </div>
+
+        {/* Powered By */}
+        <p className="login-powered">
+          Powered by Curius Cricket Club Management
+        </p>
 
       </div>
     </div>

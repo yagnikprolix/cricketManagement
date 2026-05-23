@@ -584,11 +584,10 @@ function ScoreConsoleContent() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#060913', color: 'var(--text-main)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid rgba(16, 185, 129, 0.2)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '18px', color: 'var(--text-muted)' }}>Loading Scoring Deck...</p>
-          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <div className="loading-spinner" />
+          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '16px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Loading Scoring Deck...</p>
         </div>
       </div>
     );
@@ -600,7 +599,9 @@ function ScoreConsoleContent() {
     return (
       <div style={{ background: '#060913', minHeight: '100vh', color: 'var(--text-main)' }}>
         <nav className="navbar">
-          <div className="nav-brand">🏏 dedicated scoring cockpit</div>
+          <div className="nav-brand">
+            <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Scoring Cockpit
+          </div>
           <div className="nav-links">
             <button onClick={() => router.push('/admin')} className="btn btn-secondary">Back to command center</button>
           </div>
@@ -660,28 +661,15 @@ function ScoreConsoleContent() {
       
       {/* Toast Alert Indicator */}
       {toastMsg && (
-        <div style={{
-          position: 'fixed',
-          top: '90px',
-          right: '40px',
-          padding: '16px 24px',
-          borderRadius: '12px',
-          background: toastType === 'success' ? 'rgba(16, 185, 129, 0.95)' : 'rgba(239, 68, 68, 0.95)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          color: 'white',
-          fontWeight: '600',
-          fontSize: '14px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
-          zIndex: 1001,
-          backdropFilter: 'blur(8px)',
-          animation: 'fadeIn 0.2s ease-out'
-        }}>
+        <div className={`toast-notification ${toastType === 'success' ? 'toast-success' : 'toast-error'}`}>
           {toastType === 'success' ? '✓' : '⚠️'} {toastMsg}
         </div>
       )}
 
       <nav className="navbar">
-        <div className="nav-brand"><span>🏏</span> Cricbuzz Umpiring Scoring Center</div>
+        <div className="nav-brand">
+          <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Umpiring Scoring Center
+        </div>
         <div className="nav-links">
           <button onClick={() => router.push('/admin')} className="btn btn-secondary">Command center</button>
           <button onClick={() => router.push('/live')} className="btn btn-primary" style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' }}>📺 Live Player View</button>

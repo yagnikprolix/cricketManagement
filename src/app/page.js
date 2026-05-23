@@ -54,23 +54,30 @@ export default function PlayerDashboard() {
     }
   };
 
-  // Establish native WebSocket connection for true push stream live updates
+  // Establish Pusher Channels connection for true push stream live updates
   useEffect(() => {
     console.log('[DEBUG] PlayerDashboard useEffect mounted');
     fetchDashboardData();
 
-    let socket;
-    let reconnectTimeout;
+    let pusher;
+    let channel;
 
-    function connect() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/live-stream`;
-      console.log('[WS DEBUG] Attempting WebSocket connection to:', wsUrl);
-      socket = new WebSocket(wsUrl);
+    async function connectPusher() {
+      const PusherClient = (await import('pusher-js')).default;
+      pusher = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+        cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+      });
 
-      socket.onmessage = (event) => {
+      channel = pusher.subscribe('cricket-live');
+      console.log('[Pusher] Subscribed to cricket-live channel');
+
+      channel.bind('match-update', (liveMatchData) => {
         try {
-          const liveMatchData = JSON.parse(event.data);
+          if (liveMatchData && liveMatchData._refetch) {
+            // Payload was too large — re-fetch from API
+            fetchDashboardData();
+            return;
+          }
           if (liveMatchData && liveMatchData._id) {
             // Reactively replace the live match entry in our local list to trigger immediate UI scores refresh
             setMatches((prevMatches) =>
@@ -80,27 +87,14 @@ export default function PlayerDashboard() {
         } catch (err) {
           // Silent catch for unexpected payload formats
         }
-      };
-
-      socket.onclose = () => {
-        console.log('[WS] Connection closed. Attempting reconnect in 3s...');
-        reconnectTimeout = setTimeout(connect, 3000);
-      };
-
-      socket.onerror = (err) => {
-        console.error('[WS] Connection error:', err);
-        socket.close();
-      };
+      });
     }
 
-    connect();
+    connectPusher();
 
     return () => {
-      if (socket) {
-        socket.onclose = null;
-        socket.close();
-      }
-      clearTimeout(reconnectTimeout);
+      if (channel) channel.unbind_all();
+      if (pusher) pusher.disconnect();
     };
   }, [router]);
 

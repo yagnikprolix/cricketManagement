@@ -70,22 +70,29 @@ function LiveStadiumContent() {
     }
   };
 
-  // Sync WebSocket updates
+  // Sync Pusher real-time updates
   useEffect(() => {
     fetchStadiumData();
 
-    let socket;
-    let reconnectTimeout;
+    let pusher;
+    let channel;
 
-    function connect() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/live-stream`;
-      console.log('[WS Player] Connecting to:', wsUrl);
-      socket = new WebSocket(wsUrl);
+    async function connectPusher() {
+      const PusherClient = (await import('pusher-js')).default;
+      pusher = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+        cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+      });
 
-      socket.onmessage = (event) => {
+      channel = pusher.subscribe('cricket-live');
+      console.log('[Pusher Live] Subscribed to cricket-live channel');
+
+      channel.bind('match-update', (updatedMatch) => {
         try {
-          const updatedMatch = JSON.parse(event.data);
+          if (updatedMatch && updatedMatch._refetch) {
+            // Payload was too large — re-fetch from API
+            fetchStadiumData();
+            return;
+          }
           if (updatedMatch && updatedMatch._id) {
             // Update local matches list
             setMatches(prev => prev.map(m => m._id === updatedMatch._id ? updatedMatch : m));
@@ -99,22 +106,12 @@ function LiveStadiumContent() {
             });
           }
         } catch (err) {
-          console.error('[WS Player] Failed to parse socket message:', err);
+          console.error('[Pusher Live] Failed to process event:', err);
         }
-      };
-
-      socket.onclose = () => {
-        console.log('[WS Player] Connection closed. Reconnecting in 3s...');
-        reconnectTimeout = setTimeout(connect, 3000);
-      };
-
-      socket.onerror = (err) => {
-        console.error('[WS Player] Socket error:', err);
-        socket.close();
-      };
+      });
     }
 
-    connect();
+    connectPusher();
 
     // Load available TTS voices
     if ('speechSynthesis' in window) {
@@ -135,11 +132,8 @@ function LiveStadiumContent() {
     }
 
     return () => {
-      if (socket) {
-        socket.onclose = null;
-        socket.close();
-      }
-      clearTimeout(reconnectTimeout);
+      if (channel) channel.unbind_all();
+      if (pusher) pusher.disconnect();
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }

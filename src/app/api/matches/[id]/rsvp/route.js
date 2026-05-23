@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Match from '@/models/Match';
 import { getSessionUser } from '@/lib/auth';
+import { broadcastMatchUpdate } from '@/lib/pusher';
 
 export async function POST(request, { params }) {
   try {
@@ -56,9 +57,7 @@ export async function POST(request, { params }) {
 
     await match.save();
 
-    if (global.broadcastMatchUpdate) {
-      global.broadcastMatchUpdate(match);
-    }
+    await broadcastMatchUpdate(match);
 
     return NextResponse.json(
       { message: 'RSVP submitted successfully', match },

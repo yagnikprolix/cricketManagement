@@ -1,12 +1,12 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
-import { Trophy, Search, User } from 'lucide-react';
+import { Trophy, Search, Smile } from 'lucide-react';
 import clsx from 'clsx';
 
 const ITEMS = [
   { id: 'matches', href: '/',        icon: Trophy },
   { id: 'search',  href: '/search',  icon: Search },
-  { id: 'me',      href: '/profile', icon: User },
+  { id: 'me',      href: '/profile', icon: Smile },
 ];
 
 export default function BottomNav() {

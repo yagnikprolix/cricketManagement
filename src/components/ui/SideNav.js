@@ -1,6 +1,6 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
-import { Trophy, Search, CreditCard, User, Moon, Sun } from 'lucide-react';
+import { Trophy, Search, CreditCard, Moon, Sun, Smile } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '@/components/theme/ThemeProvider';
 
@@ -8,7 +8,7 @@ const ITEMS = [
   { id: 'matches', label: 'Matches',  href: '/',         icon: Trophy },
   { id: 'search',  label: 'Search',   href: '/search',   icon: Search },
   { id: 'payments',label: 'Payments', href: '/payments', icon: CreditCard },
-  { id: 'profile', label: 'Profile',  href: '/profile',  icon: User },
+  { id: 'profile', label: 'Profile',  href: '/profile',  icon: Smile },
 ];
 
 export default function SideNav() {

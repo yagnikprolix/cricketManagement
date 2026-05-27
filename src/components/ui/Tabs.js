@@ -11,7 +11,7 @@ export default function Tabs({ current, onChange, items, className }) {
           <button
             key={it.id}
             onClick={() => onChange(it.id)}
-            className="flex-1 relative bg-transparent border-none py-3 px-2 cursor-pointer active:opacity-70 transition-opacity"
+            className="flex-1 relative bg-transparent border-none h-[48px] px-2 flex items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
             style={{ color: active ? 'var(--primary)' : 'var(--on-surface-variant)' }}
           >
             <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold tracking-[0.2px]">

@@ -128,7 +128,6 @@ export default function MatchDetailPage() {
         title="Match Details"
         scrolled={scrolled}
         leading={<IconButton icon={ArrowLeft} onClick={() => router.back()} />}
-        actions={<><IconButton icon={Share2} /><IconButton icon={MoreVertical} /></>}
       />
 
       <div 

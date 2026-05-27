@@ -25,7 +25,7 @@ export default function MatchCard({ match, onClick, userRsvp }) {
       onClick={onClick}
       className="m3-state block w-full text-left bg-[var(--surface-container-low)] rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <GroundArt variant={imageVariant} state={state} height={130} />
+      <GroundArt variant={imageVariant} state={state} height={130} className="rounded-t-3xl" />
 
       <div className="p-4">
         <div className="flex items-start justify-between gap-3 mb-3">

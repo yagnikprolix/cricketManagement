@@ -83,7 +83,6 @@ export default function PlayerDashboard() {
     <div className="min-h-screen pb-[120px] bg-[var(--background)]">
       <AppBar
         title="Matches"
-        actions={<ThemeToggle />}
         large
       />
 
@@ -98,7 +97,7 @@ export default function PlayerDashboard() {
         </div>
       </div>
 
-      <div className="px-4 space-y-3">
+      <div className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-8">
         {(filter === 'all' ? live : []).map(m => (
           <MatchCard key={m._id} match={m} userRsvp={m.rsvps?.find(r => r.userId === user?.id)} onClick={() => router.push(`/match/${m._id}`)} />
         ))}

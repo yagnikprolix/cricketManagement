@@ -1,6 +1,7 @@
 import './globals.css';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import BottomNav from '@/components/ui/BottomNav';
+import SideNav from '@/components/ui/SideNav';
 
 export const metadata = {
   title: 'Curius Cricket Club | Live Matches, RSVP & Payments',
@@ -55,10 +56,24 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..200&display=block" />
         <meta name="theme-color" content="#4F46E5" />
       </head>
-      <body>
+      <body className="bg-[var(--background)] text-[var(--on-background)] font-sans antialiased min-h-screen">
         <ThemeProvider>
-          {children}
-          <BottomNav />
+          <div className="flex flex-col md:flex-row min-h-screen relative">
+            {/* Desktop SideNav */}
+            <div className="hidden md:block w-[280px] shrink-0 border-r border-[var(--outline-variant)] bg-[var(--surface)] z-40">
+              <SideNav />
+            </div>
+            
+            {/* Main Content */}
+            <main className="flex-1 w-full relative overflow-x-hidden">
+              <div className="max-w-[1000px] mx-auto w-full min-h-screen">
+                {children}
+              </div>
+            </main>
+
+            {/* Mobile BottomNav */}
+            <BottomNav />
+          </div>
         </ThemeProvider>
       </body>
     </html>

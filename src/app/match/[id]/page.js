@@ -136,7 +136,7 @@ export default function MatchDetailPage() {
         className="flex-1 overflow-y-auto no-scrollbar"
       >
         {/* HERO */}
-        <div className="relative">
+        <div className="relative md:mt-6 md:mx-4 md:rounded-3xl overflow-hidden shrink-0">
           <GroundArt variant="ground-2" height={180} state={state} />
           <div className="absolute inset-0 pointer-events-none"
                style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)' }} />
@@ -303,7 +303,7 @@ export default function MatchDetailPage() {
               { id: 'scorecard', label: 'Scorecard', icon: ListChecks },
               { id: 'squad', label: 'Squad', icon: Users },
             ]}
-            className="-mx-4 px-2 mt-[22px]"
+            className="-mx-4 px-2 mt-[22px] md:mx-0 md:border md:border-[var(--outline-variant)] md:rounded-2xl md:overflow-hidden"
           />
 
           <div className="pt-4 animate-[crkFadeUp_0.25s_var(--ease-emph)]" key={tab}>

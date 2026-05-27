@@ -77,7 +77,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-[400px] bg-[var(--surface-container-low)] rounded-[32px] p-6 shadow-[var(--el-2)]">
+      <div className="w-full max-w-[480px] bg-[var(--surface-container-low)] rounded-[32px] p-8 md:p-10 shadow-[var(--el-2)]">
         
         {/* Logo & Brand */}
         <div className="flex flex-col items-center text-center mb-8">

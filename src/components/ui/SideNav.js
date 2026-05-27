@@ -19,7 +19,8 @@ export default function SideNav() {
   if (!pathname || pathname === '/login') return null;
 
   return (
-    <aside className="sticky top-0 h-screen flex flex-col bg-[var(--surface)] p-4 border-r border-[var(--outline-variant)]">
+    <div className="hidden md:block w-[280px] shrink-0 border-r border-[var(--outline-variant)] bg-[var(--surface)] z-40">
+      <aside className="sticky top-0 h-screen flex flex-col p-4">
       {/* Brand */}
       <div className="flex items-center gap-3 px-2 py-4 mb-4">
         <div className="w-10 h-10 bg-[var(--primary)] text-[var(--on-primary)] rounded-xl flex items-center justify-center font-black text-xl italic shadow-sm">
@@ -70,5 +71,6 @@ export default function SideNav() {
         </button>
       </div>
     </aside>
+    </div>
   );
 }

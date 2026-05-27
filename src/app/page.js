@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import AppBar from '@/components/ui/AppBar';
 import Chip from '@/components/ui/Chip';
 import Fab from '@/components/ui/Fab';
+import Button from '@/components/ui/Button';
 import MatchCard from '@/components/match/MatchCard';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Plus } from 'lucide-react';
@@ -84,6 +85,7 @@ export default function PlayerDashboard() {
       <AppBar
         title="Matches"
         large
+        actions={user?.role === 'admin' ? <Button variant="filled" size="sm" onClick={() => router.push('/admin')}>Admin</Button> : null}
       />
 
       <div className="px-4">
@@ -106,11 +108,6 @@ export default function PlayerDashboard() {
         ))}
       </div>
 
-      {user?.role === 'admin' && (
-        <Fab icon={Plus} className="fixed bottom-24 right-4" onClick={() => router.push('/admin')}>
-          Admin
-        </Fab>
-      )}
     </div>
   );
 }

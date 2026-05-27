@@ -2,6 +2,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import BottomNav from '@/components/ui/BottomNav';
 import SideNav from '@/components/ui/SideNav';
+import MainLayout from '@/components/layout/MainLayout';
 
 export const metadata = {
   title: 'Curius Cricket Club | Live Matches, RSVP & Payments',
@@ -58,22 +59,9 @@ export default function RootLayout({ children }) {
       </head>
       <body className="bg-[var(--background)] text-[var(--on-background)] font-sans antialiased min-h-screen">
         <ThemeProvider>
-          <div className="flex flex-col md:flex-row min-h-screen relative">
-            {/* Desktop SideNav */}
-            <div className="hidden md:block w-[280px] shrink-0 border-r border-[var(--outline-variant)] bg-[var(--surface)] z-40">
-              <SideNav />
-            </div>
-            
-            {/* Main Content */}
-            <main className="flex-1 w-full relative overflow-x-hidden">
-              <div className="max-w-[1000px] mx-auto w-full min-h-screen">
-                {children}
-              </div>
-            </main>
-
-            {/* Mobile BottomNav */}
-            <BottomNav />
-          </div>
+          <MainLayout>
+            {children}
+          </MainLayout>
         </ThemeProvider>
       </body>
     </html>

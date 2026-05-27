@@ -2,6 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import AppBar from '@/components/ui/AppBar';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import { ArrowLeft, LogOut } from 'lucide-react';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -485,9 +489,9 @@ export default function AdminDashboard() {
     
     // Provide dynamic feedback toast
     if (!nextStriker || !nextBowler) {
-      showToast(`🎙️ Ball recorded: ${commentaryDesc} (Select Striker/Bowler to track detailed stats!)`, 'info');
+      showToast(`Ball recorded: ${commentaryDesc} (Select Striker/Bowler to track detailed stats!)`, 'info');
     } else {
-      showToast(`🎙️ Ball recorded: ${commentaryDesc}`);
+      showToast(`Ball recorded: ${commentaryDesc}`);
     }
   };
 
@@ -681,84 +685,69 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div>
-      <nav className="navbar">
-        <div className="nav-brand">
-          <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Admin Command Center
-        </div>
-        <div className="nav-links">
-          {user && (
-            <div className="nav-user-info">
-              <span>Admin: <strong>{user.name}</strong></span>
-              <button
-                onClick={() => router.push('/admin/score')}
-                className="btn btn-primary"
-                style={{ padding: '6px 14px', fontSize: '12px', background: 'linear-gradient(135deg, var(--color-primary) 0%, #059669 100%)' }}
-              >
-                🎤 Scoring Deck
-              </button>
-              <button
-                onClick={() => router.push('/')}
-                className="btn btn-primary"
-                style={{ padding: '6px 14px', fontSize: '12px' }}
-              >
-                Player View Portal
-              </button>
-            </div>
-          )}
-          <button onClick={handleLogout} className="btn btn-danger" style={{ padding: '8px 16px', fontSize: '13px' }}>
-            Log Out
-          </button>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[var(--background)] pb-24">
+      <AppBar
+        title="Admin Panel"
+        leading={<IconButton icon={ArrowLeft} onClick={() => router.push('/')} />}
+        actions={
+          <div className="flex items-center gap-2 pr-2">
+            <span className="m3-label-sm text-[var(--on-surface-variant)] hidden md:inline-block">
+              {user?.name}
+            </span>
+            <Button variant="outlined" size="sm" onClick={handleLogout}>Log Out</Button>
+          </div>
+        }
+      />
 
-      <main className="main-wrapper">
+      <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8 lg:px-12 mt-6 md:mt-10">
         {toastMsg && (
           <div className={`toast-notification ${toastType === 'success' ? 'toast-success' : toastType === 'error' ? 'toast-error' : 'toast-info'}`}>
-            {toastType === 'success' ? '✓' : toastType === 'error' ? '⚠️' : 'ℹ️'} {toastMsg}
+            {toastMsg}
           </div>
         )}
 
-        <div className="grid-2 mt-20 mb-30">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 mt-6">
           
-          <div className="glass-card p-30">
-            <h2 style={{ fontSize: '24px', color: 'white', marginBottom: '8px' }}>
-              {editingMatchId ? '📝 Edit Match details' : '🏏 Schedule New Match'}
+          {/* Match Form */}
+          <div className="xl:col-span-7 bg-[var(--surface-container-low)] p-6 md:p-8 rounded-[32px] shadow-[var(--el-1)]">
+            <h2 className="text-[22px] text-[var(--on-surface-variant)] mb-6">
+              {editingMatchId ? 'Edit Match details' : 'Schedule New Match'}
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '20px' }}>
+            <p className="m3-body-sm text-[var(--on-surface-variant)] mb-6">
               Set location, date, ground hire total cost, and timing. Per-player shares are computed dynamically based on attendance!
             </p>
 
             <form onSubmit={handleFormSubmit}>
-              <div className="form-group">
-                <label className="form-label">Match Name / Title</label>
+              <div className="mb-4">
+                <label className="text-[15px] text-[var(--on-surface-variant)] mb-2 block">Match Name / Title</label>
                 <input
                   type="text"
                   placeholder="e.g. Saturday League vs Royal Tigers"
-                  className="form-input"
+                  className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
                 />
               </div>
 
-              <div className="grid-2" style={{ gap: '15px', marginBottom: '0' }}>
-                <div className="form-group">
-                  <label className="form-label">Date</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-4">
+                  <label className="text-[15px] text-[var(--on-surface-variant)] mb-2 block">Date</label>
                   <input
                     type="date"
-                    className="form-input"
+                    className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                     required
                   />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Timing / Duration</label>
+
+                <div className="mb-4">
+                  <label className="text-[15px] text-[var(--on-surface-variant)] mb-2 block">Timing / Duration</label>
                   <input
                     type="text"
                     placeholder="e.g. 15:30 - 18:30"
-                    className="form-input"
+                    className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
                     required
@@ -766,25 +755,26 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="grid-2" style={{ gap: '15px', marginBottom: '0' }}>
-                <div className="form-group">
-                  <label className="form-label">Match Location / Stadium</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-4">
+                  <label className="text-[15px] text-[var(--on-surface-variant)] mb-2 block">Match Location / Stadium</label>
                   <input
                     type="text"
                     placeholder="e.g. Central Turf Arena, Pitch 4"
-                    className="form-input"
+                    className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     required
                   />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Total Match Expense / Cost (₹)</label>
+
+                <div className="mb-4">
+                  <label className="text-[15px] text-[var(--on-surface-variant)] mb-2 block">Total Match Expense / Cost (₹)</label>
                   <input
                     type="number"
                     step="0.01"
                     placeholder="e.g. 1000.00"
-                    className="form-input"
+                    className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all"
                     value={totalCost}
                     onChange={(e) => setTotalCost(e.target.value)}
                     required
@@ -792,12 +782,12 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: '25px' }}>
-                <label className="form-label">Match Notes (Optional)</label>
+              <div className="mb-4" style={{ marginBottom: '25px' }}>
+                <label className="text-[15px] text-[var(--on-surface-variant)] mb-2 block">Match Notes (Optional)</label>
                 <textarea
                   rows="3"
                   placeholder="e.g. Wear white jerseys. Bring extra spikes."
-                  className="form-textarea"
+                  className="w-full p-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all"
                   style={{ resize: 'none' }}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -805,65 +795,60 @@ export default function AdminDashboard() {
               </div>
 
               <div className="gap-12">
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={formLoading}>
-                  {formLoading ? 'Saving...' : editingMatchId ? 'Update Match Schedule' : 'Create Match Schedule'}
-                </button>
+                <Button type="submit" variant="filled" full disabled={formLoading}>
+                  {editingMatchId ? 'Update Match Schedule' : 'Create Match Schedule'}
+                </Button>
                 {editingMatchId && (
-                  <button type="button" onClick={cancelEditForm} className="btn btn-secondary">
-                    Cancel
-                  </button>
+                  <Button type="button" variant="tonal" onClick={cancelEditForm}>
+                    Cancel Edit
+                  </Button>
                 )}
               </div>
             </form>
           </div>
 
-          <div className="glass-card p-30" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <h2 style={{ fontSize: '24px', color: 'white' }}>📋 Active Schedules</h2>
+          {/* Active Schedules */}
+          <div className="xl:col-span-5 bg-[var(--surface-container-low)] p-6 md:p-8 rounded-[32px] shadow-[var(--el-1)] flex flex-col">
+            <h2 className="text-[22px] text-[var(--on-surface-variant)] mb-6">
+              Active Schedules
+            </h2>
             
             {matches.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
+              <div className="text-center py-10 text-[var(--on-surface-variant)] m3-body-md">
                 <p>No active schedules built yet. Fill in the creator form to get started!</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', overflowY: 'auto', maxHeight: '420px', paddingRight: '5px' }}>
+              <div className="flex flex-col gap-4 overflow-y-auto pr-2 no-scrollbar">
                 {matches.map((m) => (
-                  <div key={m._id} style={{
-                    padding: '16px',
-                    borderRadius: '10px',
-                    border: '1px solid',
-                    borderColor: selectedMatchId === m._id ? 'var(--color-primary)' : 'var(--card-border)',
-                    background: selectedMatchId === m._id ? 'rgba(16, 185, 129, 0.05)' : 'rgba(0,0,0,0.15)',
-                    cursor: 'pointer',
-                    transition: 'var(--transition-smooth)'
-                  }} onClick={() => setSelectedMatchId(m._id)}>
-                    <div className="flex-between">
-                      <div className="gap-12">
-                        <h3 style={{ color: 'white', fontSize: '16px' }}>{m.title}</h3>
-                        {m.scorecard?.status === 'live' && (
-                          <span className="live-badge-pulse" style={{ fontSize: '8px', padding: '2px 5px' }}>Live</span>
-                        )}
+                  <div key={m._id} 
+                    className={`p-5 rounded-2xl border cursor-pointer transition-all ${selectedMatchId === m._id ? 'border-[var(--outline)] bg-[var(--surface-container-high)] shadow-[var(--el-2)]' : 'border-[var(--outline-variant)] bg-[var(--surface-container-low)] hover:bg-[var(--surface-container)]'}`}
+                    onClick={() => setSelectedMatchId(m._id)}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <h3 className="m3-title-md font-bold truncate text-[var(--on-surface)]">{m.title}</h3>
+                        <p className="m3-body-sm text-[var(--on-surface-variant)] mt-1 truncate">
+                          {m.location} · {m.time}
+                        </p>
                       </div>
-                      <span className="user-badge" style={{ fontSize: '10px' }}>₹{(m.totalCost || 0).toFixed(2)}</span>
+                      {m.scorecard?.status === 'live' && (
+                        <span className="shrink-0 bg-[var(--live)] text-[var(--on-live)] text-[10px] font-bold px-2 py-0.5 rounded-full ">
+                          Live
+                        </span>
+                      )}
                     </div>
                     
-                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                      📍 {m.location} | ⏰ {m.time}
-                    </p>
-
                     {selectedMatchId === m._id && (
-                      <div className="gap-12 mt-20" style={{ borderTop: '1px solid var(--card-border)', paddingTop: '12px' }} onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => router.push(`/admin/score?matchId=${m._id}`)} className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px', background: 'linear-gradient(135deg, var(--color-primary) 0%, #059669 100%)' }}>
-                          🎤 Dedicated Scorer
-                        </button>
-                        <button onClick={() => startEditMatch(m)} className="btn btn-warning" style={{ padding: '6px 12px', fontSize: '11px' }}>
+                      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 mt-4 pt-4 border-t border-[var(--outline-variant)]" onClick={(e) => e.stopPropagation()}>
+                        <Button variant="tonal" size="sm" onClick={() => broadcastMatchEmail(m._id)} disabled={actionLoading === m._id + '_email'}>
+                          Broadcast
+                        </Button>
+                        <Button variant="tonal" size="sm" onClick={() => startEditMatch(m)}>
                           Edit
-                        </button>
-                        <button onClick={() => handleDeleteMatch(m._id)} disabled={actionLoading === m._id} className="btn btn-danger" style={{ padding: '6px 12px', fontSize: '11px' }}>
+                        </Button>
+                        <Button variant="outlined" className="!text-[var(--error)] !border-[var(--error)] col-span-2 sm:col-span-1" size="sm" onClick={() => handleDeleteMatch(m._id)} disabled={actionLoading === m._id}>
                           Delete
-                        </button>
-                        <button onClick={() => broadcastMatchEmail(m._id)} disabled={actionLoading === m._id + '_email'} className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px', background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)', boxShadow: 'none' }}>
-                          📧 Broadcast Schedule
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -874,282 +859,34 @@ export default function AdminDashboard() {
 
         </div>
 
-        {/* Dynamic LIVE Cricbuzz Umpiring Scoring Deck */}
-        {selectedMatch && (
-          <div className="glass-card p-30 mb-30" style={{ border: '1px solid rgba(16, 185, 129, 0.3)', position: 'relative' }}>
-            
-            {/* Wicket Out Dismissal Modal Overlay */}
-            {showWicketForm && (
-              <div style={{
-                position: 'absolute',
-                top: 0, left: 0, right: 0, bottom: 0,
-                background: 'rgba(9, 13, 22, 0.95)',
-                borderRadius: '16px',
-                zIndex: 10,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '30px',
-                animation: 'fadeIn 0.25s ease'
-              }}>
-                <div className="glass-card p-30" style={{ width: '100%', maxWidth: '480px', border: '1px solid var(--color-danger)' }}>
-                  <h3 style={{ fontSize: '20px', color: 'var(--color-danger)', marginBottom: '15px' }}>🔴 Dismissal / Wicket Out Form</h3>
-                  
-                  <form onSubmit={handleWicketSubmit}>
-                    <div className="form-group">
-                      <label className="form-label">Who is OUT?</label>
-                      <select className="form-input" value={whoIsOut} onChange={(e) => setWhoIsOut(e.target.value)}>
-                        <option value="striker">Striker: {activeStriker?.name || 'Empty'}</option>
-                        <option value="nonStriker">Non-Striker: {activeNonStriker?.name || 'Empty'}</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">Wicket / Dismissal Type</label>
-                      <select className="form-input" value={dismissedType} onChange={(e) => setDismissedType(e.target.value)}>
-                        <option value="Caught">Caught</option>
-                        <option value="Bowled">Bowled</option>
-                        <option value="LBW">LBW</option>
-                        <option value="Run Out">Run Out</option>
-                        <option value="Stumped">Stumped</option>
-                      </select>
-                    </div>
-
-                    {['Caught', 'Run Out', 'Stumped'].includes(dismissedType) && (
-                      <div className="form-group">
-                        <label className="form-label">Fielder Involved</label>
-                        <select className="form-input" value={fielderId} onChange={(e) => setFielderId(e.target.value)} required>
-                          <option value="">-- Select Fielder --</option>
-                          {yesAttendees.map(p => (
-                            <option key={p.userId} value={p.userId}>{p.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    <div className="gap-12 mt-20">
-                      <button type="submit" className="btn btn-danger" style={{ flex: 1 }}>
-                        Confirm Wicket OUT
-                      </button>
-                      <button type="button" onClick={() => setShowWicketForm(false)} className="btn btn-secondary">
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
-
-            <h2 style={{ fontSize: '24px', color: 'white', marginBottom: '8px' }}>
-              🏏 Cricbuzz-Style Live Scoring & Umpiring Cockpit
-            </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '20px' }}>
-              Configure active batting strikers, bowlers, increment scores dynamically, and tap the Wicket form to log comprehensive squad statistics.
-            </p>
-
-            <div className="grid-2" style={{ gap: '30px' }}>
-              
-              {/* Umpiring Control Settings Form */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <form onSubmit={handleScorecardMetadataSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  <div className="grid-2" style={{ gap: '15px', marginBottom: '0' }}>
-                    <div className="form-group" style={{ marginBottom: '0' }}>
-                      <label className="form-label">Batting Team</label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={battingTeam}
-                        onChange={(e) => setBattingTeam(e.target.value)}
-                      />
-                    </div>
-                    <div className="form-group" style={{ marginBottom: '0' }}>
-                      <label className="form-label">Bowling Team</label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={bowlingTeam}
-                        onChange={(e) => setBowlingTeam(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid-2" style={{ gap: '15px', marginBottom: '0' }}>
-                    <div className="form-group" style={{ marginBottom: '0' }}>
-                      <label className="form-label">Target (Runs)</label>
-                      <input
-                        type="number"
-                        className="form-input"
-                        placeholder="e.g. 145"
-                        value={target}
-                        onChange={(e) => setTarget(e.target.value)}
-                      />
-                    </div>
-                    <div className="form-group" style={{ marginBottom: '0' }}>
-                      <label className="form-label">Scoring Status</label>
-                      <select
-                        className="form-input"
-                        value={scoreStatus}
-                        onChange={(e) => setScoreStatus(e.target.value)}
-                        style={{ background: 'rgba(15, 23, 42, 0.8)' }}
-                      >
-                        <option value="scheduled">Scheduled (Upcoming)</option>
-                        <option value="live">🟢 Live Scoring Active</option>
-                        <option value="completed">🏁 Completed / Finished</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <button type="submit" className="btn btn-secondary" style={{ border: '1px solid var(--color-primary)', color: 'var(--color-primary)' }}>
-                    ✓ Update Teams & Status
-                  </button>
-                </form>
-
-                {/* Active Batter & Bowler Selector panel */}
-                <div style={{ background: 'rgba(0,0,0,0.15)', padding: '16px', borderRadius: '12px', border: '1px solid var(--card-border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <h3 style={{ fontSize: '13px', color: 'white', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>Select Active Players (from RSVP Yes)</h3>
-                  
-                  <div className="form-group" style={{ marginBottom: '0' }}>
-                    <label className="form-label" style={{ fontSize: '12px' }}>🏏 Striker (On Strike)</label>
-                    <select className="form-input" style={{ padding: '8px 12px', fontSize: '13px' }} value={strikerId} onChange={(e) => handleActivePlayerSelect('striker', e.target.value)}>
-                      <option value="">-- Choose Striker --</option>
-                      {yesAttendees.map(p => (
-                        <option key={p.userId} value={p.userId} disabled={p.userId === nonStrikerId}>{p.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-group" style={{ marginBottom: '0' }}>
-                    <label className="form-label" style={{ fontSize: '12px' }}>🏏 Non-Striker</label>
-                    <select className="form-input" style={{ padding: '8px 12px', fontSize: '13px' }} value={nonStrikerId} onChange={(e) => handleActivePlayerSelect('nonStriker', e.target.value)}>
-                      <option value="">-- Choose Non-Striker --</option>
-                      {yesAttendees.map(p => (
-                        <option key={p.userId} value={p.userId} disabled={p.userId === strikerId}>{p.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-group" style={{ marginBottom: '0' }}>
-                    <label className="form-label" style={{ fontSize: '12px' }}>🔴 Bowler</label>
-                    <select className="form-input" style={{ padding: '8px 12px', fontSize: '13px' }} value={bowlerId} onChange={(e) => handleActivePlayerSelect('bowler', e.target.value)}>
-                      <option value="">-- Choose Bowler --</option>
-                      {yesAttendees.map(p => (
-                        <option key={p.userId} value={p.userId}>{p.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Digital Scoreboard & Quick Click Action Panel */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                
-                {/* Scoreboard Display Panel */}
-                <div className="scoreboard-display" style={{ padding: '16px' }}>
-                  <div className="flex-between">
-                    <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-primary)' }}>
-                      BAT: {battingTeam.toUpperCase()}
-                    </span>
-                    {scoreStatus === 'live' && <span className="live-badge-pulse" style={{ fontSize: '9px' }}>Live</span>}
-                  </div>
-                  
-                  <div className="score-main" style={{ fontSize: '36px', margin: '5px 0' }}>
-                    {runs} / {wickets}
-                  </div>
-                  
-                  <div className="score-sub">
-                    Overs: <strong style={{ color: 'white' }}>{overs}.{balls}</strong>
-                    {target > 0 && <span style={{ marginLeft: '12px' }}>🎯 Target: {target}</span>}
-                  </div>
-                </div>
-
-                {/* Active Stats Panel */}
-                <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '8px', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div>🏏 Striker: <strong>{activeStriker?.name ? `${activeStriker.name} ${activeStriker.runs}* (${activeStriker.balls}b) [${activeStriker.fours}x4, ${activeStriker.sixes}x6]` : 'Not selected'}</strong></div>
-                  <div>🏏 Non-Striker: <strong>{activeNonStriker?.name ? `${activeNonStriker.name} ${activeNonStriker.runs} (${activeNonStriker.balls}b)` : 'Not selected'}</strong></div>
-                  <div>🔴 Bowler: <strong>{activeBowler?.name ? `${activeBowler.name} ${activeBowler.wickets}/${activeBowler.runsConceded} (${activeBowler.overs}.${activeBowler.balls} ov)` : 'Not selected'}</strong></div>
-                </div>
-
-                {/* Score Increment Dashboard Grid */}
-                <div className="scoring-grid">
-                  <button onClick={() => handleScoreChange('runs', 0)} className="scoring-btn">
-                    0 (Dot)
-                  </button>
-                  <button onClick={() => handleScoreChange('runs', 1)} className="scoring-btn">
-                    +1 Run
-                  </button>
-                  <button onClick={() => handleScoreChange('runs', 2)} className="scoring-btn">
-                    +2 Runs
-                  </button>
-                  <button onClick={() => handleScoreChange('runs', 4)} className="scoring-btn scoring-btn-accent">
-                    +4 (Four)
-                  </button>
-                  
-                  <button onClick={() => handleScoreChange('runs', 6)} className="scoring-btn scoring-btn-accent">
-                    +6 (Six)
-                  </button>
-                  <button onClick={() => handleScoreChange('extras', 'Wide')} className="scoring-btn">
-                    Wide (+1)
-                  </button>
-                  <button onClick={() => handleScoreChange('extras', 'No Ball')} className="scoring-btn">
-                    No Ball (+1)
-                  </button>
-                  <button onClick={() => setShowWicketForm(true)} className="scoring-btn scoring-btn-danger">
-                    🔴 OUT!
-                  </button>
-                </div>
-
-                {/* Live Custom Commentary Logger */}
-                <form onSubmit={handleCustomCommentary} style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    type="text"
-                    placeholder="Add ball description (e.g. Beautiful cover drive...)"
-                    className="form-input"
-                    style={{ flex: 1, padding: '8px 12px', fontSize: '13px' }}
-                    value={commentaryText}
-                    onChange={(e) => setCommentaryText(e.target.value)}
-                  />
-                  <button type="submit" className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '12px' }}>
-                    Log Ball
-                  </button>
-                </form>
-
-                <div className="flex-between">
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                    * Striker auto-swaps on singles (1, 3 runs) and at end of overs (6 balls).
-                  </span>
-                  <button onClick={handleResetScorecard} className="btn btn-danger" style={{ padding: '6px 12px', fontSize: '10px' }}>
-                    Reset Board
-                  </button>
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        )}
-
         {/* Players RSVP & Payment Table Dashboard */}
-        {selectedMatch ? (
-          <div className="glass-card p-30 mb-20">
-            <div className="flex-between" style={{ marginBottom: '20px', borderBottom: '1px solid var(--card-border)', paddingBottom: '15px' }}>
-              <div>
-                <h2 style={{ fontSize: '24px', color: 'white' }}>
-                  👥 Squad RSVPs & Payments: <span style={{ color: 'var(--color-primary)' }}>{selectedMatch.title}</span>
+        {selectedMatch && (
+          <div className="mt-8 bg-[var(--surface-container-low)] p-6 md:p-8 rounded-[32px] shadow-[var(--el-1)] mb-8 overflow-x-auto">
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mb-6 pb-6 border-b border-[var(--outline-variant)] gap-4">
+              <div className="flex-1">
+                <h2 className="text-[22px] text-[var(--on-surface-variant)] mb-2">
+                  Squad RSVPs & Payments: <span className="text-[var(--primary)] font-medium">{selectedMatch.title}</span>
                 </h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>
-                  Total Ground Hire Cost: **₹{(selectedMatch.totalCost || 0).toFixed(2)}** | Attending: **{yesCount} players** | Per-Player Share: <strong style={{ color: 'var(--color-primary)' }}>₹{(selectedMatchPlayerShare || 0).toFixed(2)}</strong>
+                <p className="text-[15px] text-[var(--on-surface-variant)]">
+                  Total Ground Cost: <strong className="text-[var(--on-surface)] font-medium">₹{(selectedMatch.totalCost || 0).toFixed(2)}</strong> | Attending: <strong className="text-[var(--on-surface)] font-medium">{yesCount} players</strong> | Per-Player Share: <strong className="text-[var(--primary)] text-[16px] font-medium">₹{(selectedMatchPlayerShare || 0).toFixed(2)}</strong>
                 </p>
               </div>
 
-              <div className="gap-12">
-                <span className="badge-status badge-yes">
-                  {yesCount} Attending
-                </span>
-                <span className="badge-status badge-no">
-                  {selectedMatch.rsvps?.filter((r) => r.status === 'no').length || 0} Declined
-                </span>
+              <div className="flex flex-wrap gap-3 shrink-0">
+                <Button variant="filled" onClick={() => router.push(`/admin/score?matchId=${selectedMatch._id}`)}>
+                  Live Scoring Deck
+                </Button>
               </div>
+            </div>
+
+            <div className="flex gap-2 mb-6">
+
+              <span className="bg-[rgba(16,185,129,0.1)] text-[#10b981] px-4 py-2 rounded-full text-[13px] font-medium border border-[#10b981]/20">
+                {yesCount} Attending
+              </span>
+              <span className="bg-[rgba(239,68,68,0.1)] text-[#ef4444] px-4 py-2 rounded-full text-[13px] font-medium border border-[#ef4444]/20">
+                {selectedMatch.rsvps?.filter((r) => r.status === 'no').length || 0} Declined
+              </span>
             </div>
 
             {selectedMatch.rsvps && selectedMatch.rsvps.length === 0 ? (
@@ -1157,16 +894,15 @@ export default function AdminDashboard() {
                 <p>No players have RSVP'd to this match yet.</p>
               </div>
             ) : (
-              <div className="custom-table-container">
-                <table className="custom-table">
+              <div className="w-full">
+                <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
-                    <tr>
-                      <th>Player Name</th>
-                      <th>Email Address</th>
-                      <th>RSVP Status</th>
-                      <th>Payment status (Calculated Share)</th>
-                      <th>Last Response</th>
-                      <th>Actions</th>
+                    <tr className="border-b border-[var(--outline-variant)]">
+                      <th className="py-3 px-4 m3-label-md text-[var(--on-surface-variant)] uppercase">Player Name</th>
+                      <th className="py-3 px-4 m3-label-md text-[var(--on-surface-variant)] uppercase">Email Address</th>
+                      <th className="py-3 px-4 m3-label-md text-[var(--on-surface-variant)] uppercase">RSVP Status</th>
+                      <th className="py-3 px-4 m3-label-md text-[var(--on-surface-variant)] uppercase">Payment (Calculated)</th>
+                      <th className="py-3 px-4 m3-label-md text-[var(--on-surface-variant)] uppercase">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1211,12 +947,12 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
-        ) : (
-          matches.length > 0 && (
-            <div className="glass-card text-center p-30">
-              <p style={{ color: 'var(--text-muted)' }}>Please select a match from the active schedules to manage RSVPs and payments.</p>
-            </div>
-          )
+        )}
+        
+        {!selectedMatch && matches.length > 0 && (
+          <div className="bg-[var(--surface-container-low)] p-8 text-center rounded-[32px] shadow-[var(--el-1)] border border-[var(--outline-variant)]">
+            <p className="text-[var(--on-surface-variant)] text-[15px]">Please select a match from the active schedules to manage RSVPs and payments.</p>
+          </div>
         )}
 
       </main>

@@ -17,12 +17,14 @@ export default function BottomNav() {
     return null;
   }
 
-  // Find the active index
-  const activeIndex = ITEMS.findIndex(it => 
-    it.href === '/' ? pathname === '/' : pathname.startsWith(it.href)
-  );
-  // Default to 0 if not found, or maybe just keep it where it was.
-  const currentIndex = activeIndex === -1 ? 0 : activeIndex;
+  let currentIndex = 0;
+  if (pathname.startsWith('/search')) {
+    currentIndex = 1;
+  } else if (pathname.startsWith('/profile') || pathname.startsWith('/payments')) {
+    currentIndex = 2;
+  } else {
+    currentIndex = 0;
+  }
 
   return (
     <nav className="fixed bottom-6 inset-x-0 z-50 flex justify-center md:hidden pointer-events-none">

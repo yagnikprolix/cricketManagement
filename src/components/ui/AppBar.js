@@ -9,8 +9,8 @@ export default function AppBar({ title, leading, actions, large, scrolled = fals
       }}
     >
       <div className="flex items-center gap-1 p-2 min-h-[56px]">
-        {leading || <div className="w-2" />}
-        <div className={`flex-1 ${large ? 'm3-headline-lg px-2 py-1' : 'm3-title-lg px-2 font-semibold'}`}>
+        {leading}
+        <div className={`flex-1 ${large ? 'text-[26px] font-bold py-1 tracking-tight' : 'm3-title-lg font-semibold'} ${leading ? 'px-2' : 'pl-2 pr-2'}`}>
           {title}
         </div>
         <div className="flex gap-0.5">{actions}</div>

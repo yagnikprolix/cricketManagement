@@ -125,7 +125,7 @@ export default function MatchDetailPage() {
   return (
     <div className="flex flex-col h-screen bg-[var(--background)]">
       <AppBar
-        title={scrolled ? match.title : ''}
+        title="Match Details"
         scrolled={scrolled}
         leading={<IconButton icon={ArrowLeft} onClick={() => router.back()} />}
         actions={<><IconButton icon={Share2} /><IconButton icon={MoreVertical} /></>}
@@ -319,7 +319,7 @@ export default function MatchDetailPage() {
                   { icon: Trophy, label: 'Format', value: 'T20' },
                 ].map((r, i) => (
                   <div key={r.label} className={clsx("flex items-center gap-3.5 px-4 py-3.5", i > 0 && "border-t border-[var(--outline-variant)]")}>
-                    <r.icon size={20} className="text-[var(--on-surface-variant)]" />
+                    <r.icon size={18} className="text-[var(--on-surface-variant)]" />
                     <span className="m3-body-md text-[var(--on-surface-variant)] flex-[0_0_80px]">{r.label}</span>
                     <span className="m3-title-sm flex-1 font-semibold">{r.value}</span>
                   </div>

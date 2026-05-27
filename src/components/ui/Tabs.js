@@ -15,7 +15,7 @@ export default function Tabs({ current, onChange, items, className }) {
             style={{ color: active ? 'var(--primary)' : 'var(--on-surface-variant)' }}
           >
             <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold tracking-[0.2px]">
-              {Icon && <Icon size={18} className={active ? "text-[var(--primary)]" : "text-[var(--on-surface-variant)]"} />}
+              {Icon && <Icon size={16} className={active ? "text-[var(--primary)]" : "text-[var(--on-surface-variant)]"} />}
               {it.label}
             </span>
             <span

@@ -5,7 +5,7 @@ import AppBar from '@/components/ui/AppBar';
 import Chip from '@/components/ui/Chip';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
-import { CreditCard, Check, Clock, ChevronDown, ChevronUp, History, Send, CheckCircle, MapPin, Receipt, Trophy } from 'lucide-react';
+import { CreditCard, Check, Clock, ChevronDown, ChevronUp, Send, CheckCircle, MapPin, Receipt, Trophy, ArrowLeft } from 'lucide-react';
 import clsx from 'clsx';
 import MatchCard from '@/components/match/MatchCard';
 
@@ -57,7 +57,7 @@ export default function PaymentsPage() {
     <div className="flex flex-col h-screen bg-[var(--background)]">
       <AppBar 
         title="Payments" 
-        actions={<IconButton icon={History} />}
+        leading={<IconButton icon={ArrowLeft} onClick={() => router.back()} />}
       />
       
       <div className="flex-1 overflow-y-auto px-4 pb-[120px] no-scrollbar pt-2">
@@ -94,7 +94,7 @@ export default function PaymentsPage() {
         </div>
 
         {/* Match payment breakdown — accordion */}
-        <div className="mb-2.5">
+        <div className="mt-6 mb-3">
           <h3 className="m3-title-lg font-bold">By match</h3>
           <div className="text-sm text-[var(--on-surface-variant)]">{matchesWithPayments.length} matches</div>
         </div>

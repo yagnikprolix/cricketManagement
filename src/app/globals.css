@@ -23,10 +23,10 @@
   --primary-container: #E0E7FF;  --on-primary-container: #1E1B4B;
   --secondary-container: #E0E1F4; --on-secondary-container: #181A2E;
   --tertiary-container: #F2D9FF; --on-tertiary-container: #2D1141;
-  --error: #BA1A1A;              --error-container: #FFDAD6;
-  --success: #1F7A3A;            --success-container: #C8EFD1;
-  --warning: #B85C00;            --warning-container: #FFDDB8;
-  --live: #E53935;               --live-container: #FFDAD6;
+  --error: #BA1A1A;              --on-error: #FFFFFF;         --error-container: #FFDAD6;
+  --success: #1F7A3A;            --on-success: #FFFFFF;       --success-container: #C8EFD1;
+  --warning: #B85C00;            --on-warning: #FFFFFF;       --warning-container: #FFDDB8;
+  --live: #E53935;               --on-live: #FFFFFF;          --live-container: #FFDAD6;
 
   --background: #FBFAFD;          --on-background: #1B1B22;
   --surface: #FBFAFD;             --on-surface: #1B1B22;
@@ -43,10 +43,10 @@
   --primary-container: #383E72;  --on-primary-container: #DEE0FF;
   --secondary-container: #424563; --on-secondary-container: #E0E1F4;
   --tertiary-container: #5C3F6E; --on-tertiary-container: #FBD7FF;
-  --error: #FFB4AB;              --error-container: #93000A;
-  --success: #8FD4A0;            --success-container: #1E5B36;
-  --warning: #FFB77D;            --warning-container: #6E3F00;
-  --live: #FF6B6B;               --live-container: #5E1414;
+  --error: #FFB4AB;              --on-error: #690005;         --error-container: #93000A;
+  --success: #8FD4A0;            --on-success: #00391C;       --success-container: #1E5B36;
+  --warning: #FFB77D;            --on-warning: #4D2B00;       --warning-container: #6E3F00;
+  --live: #FF6B6B;               --on-live: #410002;          --live-container: #5E1414;
 
   --background: #131318;          --on-background: #E4E2E9;
   --surface: #131318;             --on-surface: #E4E2E9;

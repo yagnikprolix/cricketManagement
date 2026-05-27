@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AppBar from '@/components/ui/AppBar';
-import ThemeToggle from '@/components/theme/ThemeToggle';
 import Button from '@/components/ui/Button';
-import { Settings, LogOut, Shield, ChevronRight, User } from 'lucide-react';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import { Settings, LogOut, Shield, ChevronRight, Moon, Sun } from 'lucide-react';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { theme, toggle } = useTheme();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +46,6 @@ export default function ProfilePage() {
     <div className="min-h-screen pb-[120px] bg-[var(--background)]">
       <AppBar 
         title="Profile" 
-        actions={<ThemeToggle />}
         large 
       />
       
@@ -67,15 +67,10 @@ export default function ProfilePage() {
 
         {/* Options */}
         <div className="bg-[var(--surface-container-low)] rounded-3xl overflow-hidden">
-          <button className="w-full flex items-center justify-between p-4 bg-transparent border-none text-left m3-state border-b border-[var(--outline-variant)]">
-            <div className="flex items-center gap-3 text-[var(--on-surface)]">
-              <User size={20} className="text-[var(--primary)]" />
-              <span className="font-semibold text-[15px]">Personal Details</span>
-            </div>
-            <ChevronRight size={20} className="text-[var(--on-surface-variant)]" />
-          </button>
-          
-          <button className="w-full flex items-center justify-between p-4 bg-transparent border-none text-left m3-state border-b border-[var(--outline-variant)]" onClick={() => router.push('/payments')}>
+          <button 
+            className="w-full flex items-center justify-between p-4 bg-transparent border-none text-left m3-state border-b border-[var(--outline-variant)]" 
+            onClick={() => router.push('/payments')}
+          >
             <div className="flex items-center gap-3 text-[var(--on-surface)]">
               <Shield size={20} className="text-[var(--primary)]" />
               <span className="font-semibold text-[15px]">Payments & Dues</span>
@@ -83,12 +78,21 @@ export default function ProfilePage() {
             <ChevronRight size={20} className="text-[var(--on-surface-variant)]" />
           </button>
           
-          <button className="w-full flex items-center justify-between p-4 bg-transparent border-none text-left m3-state">
+          <button 
+            className="w-full flex items-center justify-between p-4 bg-transparent border-none text-left m3-state"
+            onClick={toggle}
+          >
             <div className="flex items-center gap-3 text-[var(--on-surface)]">
-              <Settings size={20} className="text-[var(--primary)]" />
-              <span className="font-semibold text-[15px]">App Settings</span>
+              {theme === 'dark' ? (
+                <Sun size={20} className="text-[var(--primary)]" />
+              ) : (
+                <Moon size={20} className="text-[var(--primary)]" />
+              )}
+              <span className="font-semibold text-[15px]">Dark Mode</span>
             </div>
-            <ChevronRight size={20} className="text-[var(--on-surface-variant)]" />
+            <div className={`relative w-[48px] h-[28px] rounded-full transition-colors duration-300 ${theme === 'dark' ? 'bg-[var(--primary)]' : 'bg-[var(--surface-container-highest)] border-2 border-[var(--outline)]'}`}>
+              <div className={`absolute top-1/2 -translate-y-1/2 rounded-full transition-all duration-300 ${theme === 'dark' ? 'w-[20px] h-[20px] bg-[var(--on-primary)] right-[4px]' : 'w-[16px] h-[16px] bg-[var(--outline)] left-[4px]'}`} />
+            </div>
           </button>
         </div>
 

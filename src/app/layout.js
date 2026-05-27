@@ -1,4 +1,6 @@
 import './globals.css';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import BottomNav from '@/components/ui/BottomNav';
 
 export const metadata = {
   title: 'Curius Cricket Club | Live Matches, RSVP & Payments',
@@ -37,7 +39,7 @@ export const metadata = {
     apple: '/curius-logo.png',
   },
   other: {
-    'theme-color': '#10b981',
+    'theme-color': '#4F46E5',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
   },
@@ -49,10 +51,15 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <meta name="theme-color" content="#10b981" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..200&display=block" />
+        <meta name="theme-color" content="#4F46E5" />
       </head>
       <body>
-        {children}
+        <ThemeProvider>
+          {children}
+          <BottomNav />
+        </ThemeProvider>
       </body>
     </html>
   );

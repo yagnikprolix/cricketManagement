@@ -3,6 +3,41 @@ import dbConnect from '@/lib/db';
 import Match from '@/models/Match';
 import { getSessionUser } from '@/lib/auth';
 
+export async function GET(request, { params }) {
+  try {
+    await dbConnect();
+    const session = await getSessionUser();
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+    const match = await Match.findById(id);
+    
+    if (!match) {
+      return NextResponse.json(
+        { error: 'Match not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { match },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Fetch match error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(request, { params }) {
   try {
     await dbConnect();

@@ -75,14 +75,14 @@ export default function LoginPage() {
 
   return (
     <div className="login-wrapper">
-      <div className="glass-card login-card">
-        
-        {/* Logo & Brand Section */}
+      <div className="login-card">
+
+        {/* Logo & Brand */}
         <div className="login-logo-section">
           <div className="login-logo-icon">
             <img src="/curius-logo.png" alt="Curius Cricket Club" />
           </div>
-          <h1 className="login-brand-name">CURIUS</h1>
+          <h1 className="login-brand-name">Curius Cricket</h1>
           <p className="login-tagline">
             {isRegister ? 'Create your account to join the squad' : 'Sign in to your cricket club portal'}
           </p>
@@ -109,7 +109,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Login Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit}>
           {isRegister && (
             <div className="form-group">
@@ -141,7 +141,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="form-group" style={{ marginBottom: '28px' }}>
+          <div className="form-group" style={{ marginBottom: 24 }}>
             <label className="form-label" htmlFor="login-password">Password</label>
             <div style={{ position: 'relative' }}>
               <input
@@ -159,18 +159,9 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  transition: 'color 0.2s ease',
+                  position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: 'var(--on-surface-variant)',
+                  cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center',
                 }}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
@@ -189,42 +180,34 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%', padding: '12px 24px', fontSize: '15px' }} 
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%', padding: '13px 24px', fontSize: '15px', borderRadius: 'var(--r-full)' }}
             disabled={loading}
             id="login-submit-btn"
           >
             {loading ? (
               <>
-                <span className="loading-spinner" style={{ width: '18px', height: '18px', borderWidth: '2px' }} />
-                Processing...
+                <span className="loading-spinner" style={{ width: 18, height: 18, borderWidth: 2 }} />
+                Processing…
               </>
             ) : isRegister ? 'Create Account' : 'Sign In'}
           </button>
         </form>
 
-        {/* Toggle Register/Login */}
+        {/* Toggle */}
         <div className="login-footer">
           {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
-            onClick={() => {
-              setIsRegister(!isRegister);
-              setError('');
-              setSuccess('');
-            }}
+            onClick={() => { setIsRegister(!isRegister); setError(''); setSuccess(''); }}
             className="login-footer-toggle"
           >
             {isRegister ? 'Sign in here' : 'Create account'}
           </button>
         </div>
 
-        {/* Powered By */}
-        <p className="login-powered">
-          Powered by Curius Cricket Club Management
-        </p>
-
+        <p className="login-powered">Powered by Curius Cricket Club Management</p>
       </div>
     </div>
   );

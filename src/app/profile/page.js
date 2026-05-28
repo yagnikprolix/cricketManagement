@@ -5,6 +5,7 @@ import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { Settings, LogOut, Shield, ChevronRight, Moon, Sun } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-[var(--background)] flex items-center justify-center"><div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <Loader fullScreen />;
 
   return (
     <div className="min-h-screen pb-[120px] bg-[var(--background)]">

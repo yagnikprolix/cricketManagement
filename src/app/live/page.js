@@ -6,6 +6,7 @@ import AppBar from '@/components/ui/AppBar';
 import Tabs from '@/components/ui/Tabs';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
+import Loader from '@/components/ui/Loader';
 import { ArrowLeft, Radio, Trophy, Activity, User, CircleDot, Mic, MicOff, MapPin, Table, LineChart, Target, Volume2, VolumeX } from 'lucide-react';
 
 function LiveStadiumContent() {
@@ -200,14 +201,7 @@ function LiveStadiumContent() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-[var(--background)] text-[var(--on-background)]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[16px] text-[var(--on-surface-variant)]">Entering Stadium Hub...</p>
-        </div>
-      </div>
-    );
+    return <Loader text="Entering Stadium Hub..." fullScreen />;
   }
 
   // Visual placeholders if no match is currently running or scheduled
@@ -715,11 +709,7 @@ function LiveStadiumContent() {
 
 export default function LiveStadium() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center items-center min-h-screen bg-[var(--background)] text-[var(--on-background)]">
-        <div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense fallback={<Loader text="" fullScreen />}>
       <LiveStadiumContent />
     </Suspense>
   );

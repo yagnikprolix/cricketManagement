@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import AppBar from '@/components/ui/AppBar';
 import MatchCard from '@/components/match/MatchCard';
 import { Search as SearchIcon } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 export default function SearchPage() {
   const router = useRouter();
@@ -30,6 +31,8 @@ export default function SearchPage() {
     m.title.toLowerCase().includes(query.toLowerCase()) || 
     m.location.toLowerCase().includes(query.toLowerCase())
   );
+
+  if (loading) return <Loader fullScreen />;
 
   return (
     <div className="min-h-screen pb-[120px] bg-[var(--background)]">

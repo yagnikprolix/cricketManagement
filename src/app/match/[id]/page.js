@@ -10,6 +10,7 @@ import IconButton from '@/components/ui/IconButton';
 import Chip from '@/components/ui/Chip';
 import { ArrowLeft, Share2, MoreVertical, Calendar, Clock, MapPin, IndianRupee, Users, Trophy, MessageSquare, ListChecks, Check, X, HelpCircle, Send, Volume2, CheckCircle, Info, Activity } from 'lucide-react';
 import clsx from 'clsx';
+import Loader from '@/components/ui/Loader';
 
 export default function MatchDetailPage() {
   const router = useRouter();
@@ -92,11 +93,7 @@ export default function MatchDetailPage() {
     }
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-screen bg-[var(--background)]">
-      <div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
+  if (loading) return <Loader fullScreen />;
   if (!match) return <div className="p-8 text-center bg-[var(--background)] h-screen text-[var(--on-surface)]">Match not found</div>;
 
   const isLive = match.scorecard?.status === 'live';

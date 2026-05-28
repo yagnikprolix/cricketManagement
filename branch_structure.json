@@ -1,0 +1,15 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "main",
+    "new-ui"
+  ],
+  "parent": {
+    "main": null,
+    "new-ui": "main"
+  },
+  "order": [
+    "main",
+    "new-ui"
+  ]
+}

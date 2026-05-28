@@ -7,6 +7,7 @@ import Fab from '@/components/ui/Fab';
 import Button from '@/components/ui/Button';
 import MatchCard from '@/components/match/MatchCard';
 import ThemeToggle from '@/components/theme/ThemeToggle';
+import Loader from '@/components/ui/Loader';
 import { Plus } from 'lucide-react';
 
 export default function PlayerDashboard() {
@@ -64,12 +65,7 @@ export default function PlayerDashboard() {
   }, [router]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-[var(--background)] flex-col gap-4">
-        <div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[var(--on-surface-variant)] tracking-wide">Loading Cricket Portal…</p>
-      </div>
-    );
+    return <Loader text="Loading Cricket Portal…" fullScreen />;
   }
 
   const live = matches.filter(m => m.scorecard?.status === 'live');

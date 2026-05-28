@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
+import Loader from '@/components/ui/Loader';
 import { ArrowLeft } from 'lucide-react';
 
 // Dynamic Commentary Generator Helper
@@ -586,14 +587,7 @@ function ScoreConsoleContent() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="loading-spinner" />
-          <p className="text-[16px] text-[var(--on-surface-variant)] tracking-[0.5px]">Loading Scoring Deck...</p>
-        </div>
-      </div>
-    );
+    return <Loader text="Loading Scoring Deck..." fullScreen />;
   }
 
   // Dashboard Match Selector if no matchId is specified
@@ -885,11 +879,7 @@ function ScoreConsoleContent() {
 
 export default function DedicatedScorerConsole() {
   return (
-    <Suspense fallback={
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#060913', color: 'var(--text-main)' }}>
-        <p>Loading Console components...</p>
-      </div>
-    }>
+    <Suspense fallback={<Loader text="Loading Console components..." fullScreen />}>
       <ScoreConsoleContent />
     </Suspense>
   );

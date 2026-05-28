@@ -8,6 +8,7 @@ import IconButton from '@/components/ui/IconButton';
 import { CreditCard, Check, Clock, ChevronDown, ChevronUp, Send, CheckCircle, MapPin, Receipt, Trophy, ArrowLeft } from 'lucide-react';
 import clsx from 'clsx';
 import MatchCard from '@/components/match/MatchCard';
+import Loader from '@/components/ui/Loader';
 
 export default function PaymentsPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function PaymentsPage() {
     fetchData();
   }, [router]);
 
-  if (loading) return <div className="flex justify-center items-center h-screen bg-[var(--background)] flex-col gap-4"><div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <Loader fullScreen />;
 
   const matchesWithPayments = matches.filter(m => (m.scorecard?.status === 'completed' || m.rsvps?.some(r => r.paymentStatus)) && m.rsvps?.length > 0);
 

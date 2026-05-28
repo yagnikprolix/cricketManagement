@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
+import Loader from '@/components/ui/Loader';
 import { ArrowLeft, LogOut } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -676,14 +677,7 @@ export default function AdminDashboard() {
   };
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-          <div className="loading-spinner" />
-          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '16px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Opening Command Center...</p>
-        </div>
-      </div>
-    );
+    return <Loader text="Opening Command Center..." fullScreen />;
   }
 
   return (

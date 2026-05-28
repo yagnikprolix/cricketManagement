@@ -43,6 +43,13 @@ export async function POST(request, { params }) {
         batsmenStats: [],
         bowlersStats: [],
         commentary: [],
+        tossWinner: '',
+        tossDecision: '',
+        teamACaptain: '',
+        teamBCaptain: '',
+        teamAPlayers: [],
+        teamBPlayers: [],
+        previousBowlerId: '',
       };
     }
 
@@ -62,6 +69,13 @@ export async function POST(request, { params }) {
         batsmenStats: [],
         bowlersStats: [],
         commentary: [],
+        tossWinner: '',
+        tossDecision: '',
+        teamACaptain: '',
+        teamBCaptain: '',
+        teamAPlayers: [],
+        teamBPlayers: [],
+        previousBowlerId: '',
       };
       await match.save();
       await broadcastMatchUpdate(match);
@@ -72,6 +86,14 @@ export async function POST(request, { params }) {
     if (body.battingTeam) match.scorecard.battingTeam = body.battingTeam;
     if (body.bowlingTeam) match.scorecard.bowlingTeam = body.bowlingTeam;
     if (typeof body.target === 'number') match.scorecard.target = body.target;
+
+    if (body.tossWinner !== undefined) match.scorecard.tossWinner = body.tossWinner;
+    if (body.tossDecision !== undefined) match.scorecard.tossDecision = body.tossDecision;
+    if (body.teamACaptain !== undefined) match.scorecard.teamACaptain = body.teamACaptain;
+    if (body.teamBCaptain !== undefined) match.scorecard.teamBCaptain = body.teamBCaptain;
+    if (body.teamAPlayers !== undefined) match.scorecard.teamAPlayers = body.teamAPlayers;
+    if (body.teamBPlayers !== undefined) match.scorecard.teamBPlayers = body.teamBPlayers;
+    if (body.previousBowlerId !== undefined) match.scorecard.previousBowlerId = body.previousBowlerId;
 
     if (typeof body.runs === 'number') match.scorecard.runs = body.runs;
     if (typeof body.wickets === 'number') match.scorecard.wickets = body.wickets;

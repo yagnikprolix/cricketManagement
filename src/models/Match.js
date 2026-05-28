@@ -94,6 +94,13 @@ const ScorecardSchema = new mongoose.Schema({
   batsmenStats: [BatsmanStatSchema],
   bowlersStats: [BowlerStatSchema],
   commentary: [ScorecardCommentarySchema],
+  tossWinner: { type: String, default: '' },
+  tossDecision: { type: String, default: '' },
+  teamACaptain: { type: String, default: '' },
+  teamBCaptain: { type: String, default: '' },
+  teamAPlayers: { type: [String], default: [] },
+  teamBPlayers: { type: [String], default: [] },
+  previousBowlerId: { type: String, default: '' },
 });
 
 const MatchSchema = new mongoose.Schema({
@@ -138,6 +145,13 @@ const MatchSchema = new mongoose.Schema({
       balls: 0,
       target: 0,
       commentary: [],
+      tossWinner: '',
+      tossDecision: '',
+      teamACaptain: '',
+      teamBCaptain: '',
+      teamAPlayers: [],
+      teamBPlayers: [],
+      previousBowlerId: '',
     }),
   },
   createdAt: {

@@ -114,6 +114,15 @@ function ScoreConsoleContent() {
   const [scoreStatus, setScoreStatus] = useState('scheduled');
   const [commentaryText, setCommentaryText] = useState('');
 
+  // New squad & toss states
+  const [tossWinner, setTossWinner] = useState('');
+  const [tossDecision, setTossDecision] = useState('');
+  const [teamACaptain, setTeamACaptain] = useState('');
+  const [teamBCaptain, setTeamBCaptain] = useState('');
+  const [teamAPlayers, setTeamAPlayers] = useState([]);
+  const [teamBPlayers, setTeamBPlayers] = useState([]);
+  const [previousBowlerId, setPreviousBowlerId] = useState('');
+
   // Active striker/bowler selectors
   const [strikerId, setStrikerId] = useState('');
   const [nonStrikerId, setNonStrikerId] = useState('');
@@ -132,12 +141,14 @@ function ScoreConsoleContent() {
   const [whoIsOut, setWhoIsOut] = useState('striker'); // striker, nonStriker
   const [fielderId, setFielderId] = useState('');
 
+  // Feedbacks
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState('success');
+
   const showToast = (msg, type = 'success') => {
-    if (type === 'error') {
-      toast.error(msg);
-    } else {
-      toast.success(msg);
-    }
+    setToastMsg(msg);
+    setToastType(type);
+    setTimeout(() => setToastMsg(''), 4500);
   };
 
   const fetchScorerData = async () => {
@@ -196,6 +207,15 @@ function ScoreConsoleContent() {
 
     setBatsmenStats(sc.batsmenStats || []);
     setBowlersStats(sc.bowlersStats || []);
+
+    // Load new squad, captains, toss, & previous bowler details
+    setTossWinner(sc.tossWinner || '');
+    setTossDecision(sc.tossDecision || '');
+    setTeamACaptain(sc.teamACaptain || '');
+    setTeamBCaptain(sc.teamBCaptain || '');
+    setTeamAPlayers(sc.teamAPlayers || []);
+    setTeamBPlayers(sc.teamBPlayers || []);
+    setPreviousBowlerId(sc.previousBowlerId || '');
   };
 
   useEffect(() => {
@@ -268,6 +288,72 @@ function ScoreConsoleContent() {
     showToast(`Active ${role} changed successfully!`);
   };
 
+  const handlePlayerTeamToggle = (userId, team) => {
+    if (team === 'A') {
+      setTeamAPlayers(prev => [...new Set([...prev, userId])]);
+      setTeamBPlayers(prev => prev.filter(id => id !== userId));
+      if (teamBCaptain === userId) setTeamBCaptain('');
+    } else if (team === 'B') {
+      setTeamBPlayers(prev => [...new Set([...prev, userId])]);
+      setTeamAPlayers(prev => prev.filter(id => id !== userId));
+      if (teamACaptain === userId) setTeamACaptain('');
+    }
+  };
+
+  const handleLockSquadsAndToss = async (e) => {
+    e.preventDefault();
+    if (!tossWinner || !tossDecision) {
+      showToast('Please select toss winner and decision!', 'error');
+      return;
+    }
+    
+    let nextBatting = '';
+    let nextBowling = '';
+    
+    if (tossWinner === 'Team A') {
+      if (tossDecision === 'bat') {
+        nextBatting = battingTeam || 'Team A';
+        nextBowling = bowlingTeam || 'Team B';
+      } else {
+        nextBatting = bowlingTeam || 'Team B';
+        nextBowling = battingTeam || 'Team A';
+      }
+    } else {
+      if (tossDecision === 'bat') {
+        nextBatting = bowlingTeam || 'Team B';
+        nextBowling = battingTeam || 'Team A';
+      } else {
+        nextBatting = battingTeam || 'Team A';
+        nextBowling = bowlingTeam || 'Team B';
+      }
+    }
+
+    setBattingTeam(nextBatting);
+    setBowlingTeam(nextBowling);
+    
+    const winnerName = tossWinner === 'Team A' ? battingTeam : bowlingTeam;
+    const tossText = `${winnerName} won the toss and elected to ${tossDecision === 'bat' ? 'bat' : 'bowl'} first.`;
+
+    const syncPayload = {
+      tossWinner,
+      tossDecision,
+      teamACaptain,
+      teamBCaptain,
+      teamAPlayers,
+      teamBPlayers,
+      battingTeam: nextBatting,
+      bowlingTeam: nextBowling,
+      newCommentary: {
+        ball: '0.0',
+        runs: 0,
+        description: `🪙 TOSS: ${tossText}`,
+      }
+    };
+
+    await syncScorecard(syncPayload);
+    showToast(`🪙 Toss recorded successfully!`);
+  };
+
   const handleScoreChange = (type, value) => {
     let nextRuns = Number(runs) || 0;
     let nextBalls = Number(balls) || 0;
@@ -333,10 +419,16 @@ function ScoreConsoleContent() {
     }
 
     // Handle end of over changes (6 valid balls bowled)
+    let nextPrevBowlerId = previousBowlerId;
     if (nextBalls >= 6) {
       nextBalls = 0;
       nextOvers += 1;
       commentaryDesc += ` End of over ${nextOvers}.`;
+
+      if (nextBowler) {
+        nextPrevBowlerId = nextBowler.userId;
+        setPreviousBowlerId(nextBowler.userId);
+      }
 
       // Over change strike swap
       if (nextStriker && nextNonStriker) {
@@ -360,6 +452,7 @@ function ScoreConsoleContent() {
       activeStriker: nextStriker,
       activeNonStriker: nextNonStriker,
       activeBowler: nextBowler,
+      previousBowlerId: nextPrevBowlerId,
       newCommentary: {
         ball: `${nextOvers}.${nextBalls}`,
         runs: type === 'runs' ? Number(value) : 1,
@@ -445,9 +538,15 @@ function ScoreConsoleContent() {
       }
     }
 
+    let nextPrevBowlerId = previousBowlerId;
     if (nextBalls >= 6) {
       nextBalls = 0;
       nextOvers += 1;
+
+      if (nextBowler) {
+        nextPrevBowlerId = nextBowler.userId;
+        setPreviousBowlerId(nextBowler.userId);
+      }
     }
 
     const fielder = yesAttendees.find(r => r.userId === fielderId);
@@ -515,6 +614,7 @@ function ScoreConsoleContent() {
       activeStriker: nextStriker,
       activeNonStriker: nextNonStriker,
       activeBowler: nextBowler,
+      previousBowlerId: nextPrevBowlerId,
       batsmenStats: updatedBatsmenStats,
       newCommentary: {
         ball: `${nextOvers}.${nextBalls}`,
@@ -582,6 +682,13 @@ function ScoreConsoleContent() {
     setBowlerId('');
     setBatsmenStats([]);
     setBowlersStats([]);
+    setTossWinner('');
+    setTossDecision('');
+    setTeamACaptain('');
+    setTeamBCaptain('');
+    setTeamAPlayers([]);
+    setTeamBPlayers([]);
+    setPreviousBowlerId('');
 
     syncScorecard({ reset: true });
   };
@@ -725,6 +832,123 @@ function ScoreConsoleContent() {
               
               {/* Umpiring Settings Panel */}
               <div className="flex flex-col gap-6">
+                {/* Squad Assignment & Toss Panel */}
+                <form onSubmit={handleLockSquadsAndToss} className="bg-[var(--surface-container)] p-6 rounded-2xl flex flex-col gap-4">
+                  <h3 className="text-[16px] font-medium text-[var(--on-surface)] border-b border-[var(--outline)] pb-2 flex items-center gap-2">
+                    🪙 Team Squads & Toss Setup
+                  </h3>
+                  
+                  {/* Player Squad Assignment Grid */}
+                  <div className="flex flex-col gap-3">
+                    <span className="text-[13px] text-[var(--on-surface-variant)] font-medium">Assign Players to Squads:</span>
+                    <div className="max-h-[220px] overflow-y-auto pr-1 flex flex-col gap-2 no-scrollbar">
+                      {yesAttendees.length === 0 ? (
+                        <div className="text-[13px] text-[var(--on-surface-variant)] italic p-2 text-center">
+                          No players registered for RSVP Yes yet.
+                        </div>
+                      ) : (
+                        yesAttendees.map(p => {
+                          const isTeamA = teamAPlayers.includes(p.userId);
+                          const isTeamB = teamBPlayers.includes(p.userId);
+                          return (
+                            <div key={p.userId} className="flex items-center justify-between bg-[var(--surface-container-highest)] p-3 rounded-xl">
+                              <span className="text-[14px] text-[var(--on-surface)] font-medium">{p.name}</span>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handlePlayerTeamToggle(p.userId, 'A')}
+                                  className={`px-3 py-1 rounded-full text-[12px] font-medium transition-all ${
+                                    isTeamA 
+                                      ? 'bg-[var(--primary)] text-[var(--on-primary)]' 
+                                      : 'bg-[var(--surface-container-high)] text-[var(--on-surface-variant)] hover:bg-[var(--surface-container-highest)]'
+                                  }`}
+                                >
+                                  Team A
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handlePlayerTeamToggle(p.userId, 'B')}
+                                  className={`px-3 py-1 rounded-full text-[12px] font-medium transition-all ${
+                                    isTeamB 
+                                      ? 'bg-[var(--primary)] text-[var(--on-primary)]' 
+                                      : 'bg-[var(--surface-container-high)] text-[var(--on-surface-variant)] hover:bg-[var(--surface-container-highest)]'
+                                  }`}
+                                >
+                                  Team B
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Captain Pick dropdowns */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[13px] text-[var(--on-surface-variant)]">Team A Captain</label>
+                      <select 
+                        className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[48px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[14px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)]"
+                        value={teamACaptain}
+                        onChange={(e) => setTeamACaptain(e.target.value)}
+                      >
+                        <option value="">-- Choose Captain --</option>
+                        {yesAttendees.filter(p => teamAPlayers.includes(p.userId)).map(p => (
+                          <option key={p.userId} value={p.userId}>{p.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[13px] text-[var(--on-surface-variant)]">Team B Captain</label>
+                      <select 
+                        className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[48px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[14px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)]"
+                        value={teamBCaptain}
+                        onChange={(e) => setTeamBCaptain(e.target.value)}
+                      >
+                        <option value="">-- Choose Captain --</option>
+                        {yesAttendees.filter(p => teamBPlayers.includes(p.userId)).map(p => (
+                          <option key={p.userId} value={p.userId}>{p.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Toss selector */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[13px] text-[var(--on-surface-variant)]">Toss Winner</label>
+                      <select
+                        className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[48px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[14px] text-[var(--on-surface)] focus:outline-none"
+                        value={tossWinner}
+                        onChange={(e) => setTossWinner(e.target.value)}
+                      >
+                        <option value="">-- Select Winner --</option>
+                        <option value="Team A">Team A ({battingTeam})</option>
+                        <option value="Team B">Team B ({bowlingTeam})</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[13px] text-[var(--on-surface-variant)]">Toss Decision</label>
+                      <select
+                        className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[48px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[14px] text-[var(--on-surface)] focus:outline-none"
+                        value={tossDecision}
+                        onChange={(e) => setTossDecision(e.target.value)}
+                      >
+                        <option value="">-- Select Decision --</option>
+                        <option value="bat">Elect to Bat first</option>
+                        <option value="bowl">Elect to Bowl first</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <Button type="submit" variant="filled" className="w-full mt-2">
+                    Lock Squads & Set Toss 🪙
+                  </Button>
+                </form>
+
                 <form onSubmit={handleMetadataSubmit} className="bg-[var(--surface-container)] p-6 rounded-2xl flex flex-col gap-4">
                   <h3 className="text-[15px] text-[var(--on-surface)]">Scorecard parameters</h3>
                   
@@ -769,9 +993,14 @@ function ScoreConsoleContent() {
                     <label className="text-[14px] text-[var(--on-surface-variant)]">Striker (On Strike)</label>
                     <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={strikerId} onChange={(e) => handleActivePlayerSelect('striker', e.target.value)}>
                       <option value="">-- Select Striker --</option>
-                      {yesAttendees.map(p => (
-                        <option key={p.userId} value={p.userId} disabled={p.userId === nonStrikerId}>{p.name}</option>
-                      ))}
+                      {yesAttendees.map(p => {
+                        const isOut = batsmenStats.find(b => b.userId === p.userId)?.status === 'out';
+                        return (
+                          <option key={p.userId} value={p.userId} disabled={p.userId === nonStrikerId || isOut}>
+                            {p.name} {isOut ? ' (OUT)' : ''}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
@@ -779,9 +1008,14 @@ function ScoreConsoleContent() {
                     <label className="text-[14px] text-[var(--on-surface-variant)]">Non-Striker</label>
                     <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={nonStrikerId} onChange={(e) => handleActivePlayerSelect('nonStriker', e.target.value)}>
                       <option value="">-- Select Non-Striker --</option>
-                      {yesAttendees.map(p => (
-                        <option key={p.userId} value={p.userId} disabled={p.userId === strikerId}>{p.name}</option>
-                      ))}
+                      {yesAttendees.map(p => {
+                        const isOut = batsmenStats.find(b => b.userId === p.userId)?.status === 'out';
+                        return (
+                          <option key={p.userId} value={p.userId} disabled={p.userId === strikerId || isOut}>
+                            {p.name} {isOut ? ' (OUT)' : ''}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
@@ -789,9 +1023,14 @@ function ScoreConsoleContent() {
                     <label className="text-[14px] text-[var(--on-surface-variant)]">Bowler</label>
                     <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={bowlerId} onChange={(e) => handleActivePlayerSelect('bowler', e.target.value)}>
                       <option value="">-- Select Bowler --</option>
-                      {yesAttendees.map(p => (
-                        <option key={p.userId} value={p.userId}>{p.name}</option>
-                      ))}
+                      {yesAttendees.map(p => {
+                        const isPrev = p.userId === previousBowlerId;
+                        return (
+                          <option key={p.userId} value={p.userId} disabled={isPrev}>
+                            {p.name} {isPrev ? ' (Just Bowled Over)' : ''}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
                 </div>

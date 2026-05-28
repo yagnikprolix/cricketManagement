@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Material 3 Expressive — Indigo seed. Light is default; .dark overrides. */
 :root {

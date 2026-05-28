@@ -172,6 +172,12 @@ export default function MatchDetailPage() {
                 </div>
               </div>
 
+              {sc.tossWinner && (
+                <div className="mt-2 text-xs text-amber-500 font-medium bg-[var(--surface-container)] px-3 py-2 rounded-xl flex items-center gap-1.5 border border-amber-500/10">
+                  🪙 <strong>{sc.tossWinner === 'Team A' ? (sc.battingTeam || 'Team A') : sc.tossWinner === 'Team B' ? (sc.bowlingTeam || 'Team B') : sc.tossWinner}</strong> won the toss and elected to <strong>{sc.tossDecision === 'bat' ? 'bat' : 'bowl'}</strong> first.
+                </div>
+              )}
+
               {/* Batters */}
               <div className="mt-3.5 p-3 rounded-2xl bg-[var(--surface-container)] grid grid-cols-2 gap-3">
                 <div>
@@ -379,7 +385,9 @@ export default function MatchDetailPage() {
                         </div>
                         <div className="min-w-0">
                           <div className="m3-title-sm font-semibold flex items-center gap-1 truncate">
-                            {b.name.split(' ')[0]} {b.name === sc.activeStriker?.name && <span className="text-[var(--primary)]">•</span>}
+                            {b.name.split(' ')[0]} 
+                            {(sc.teamACaptain === b.userId || sc.teamBCaptain === b.userId) && <span className="text-amber-500 text-[10px] font-bold"> (c)</span>}
+                            {b.name === sc.activeStriker?.name && <span className="text-[var(--primary)]">•</span>}
                           </div>
                           <div className="m3-label-md text-[var(--on-surface-variant)] truncate">{b.dismissalInfo || 'not out'}</div>
                         </div>
@@ -405,7 +413,10 @@ export default function MatchDetailPage() {
                         <div className="w-7 h-7 rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)] flex items-center justify-center font-bold text-xs flex-shrink-0">
                           {b.name?.slice(0, 2).toUpperCase() || 'BW'}
                         </div>
-                        <span className="m3-title-sm font-semibold truncate">{b.name.split(' ')[0]}</span>
+                        <span className="m3-title-sm font-semibold truncate">
+                          {b.name.split(' ')[0]}
+                          {(sc.teamACaptain === b.userId || sc.teamBCaptain === b.userId) && <span className="text-amber-500 text-[10px] font-bold"> (c)</span>}
+                        </span>
                       </div>
                       <span className="m3-body-sm text-right">{b.overs}.{b.balls}</span>
                       <span className="m3-body-sm text-right">{b.runsConceded}</span>
@@ -431,25 +442,92 @@ export default function MatchDetailPage() {
             )}
 
             {tab === 'squad' && (
-              <div className="grid gap-1 bg-[var(--surface-container-low)] rounded-2xl overflow-hidden p-1">
-                {match.rsvps?.map(p => (
-                  <div key={p.userId} className="flex items-center gap-3 p-2.5 rounded-xl">
-                    <div className="w-9 h-9 rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)] flex items-center justify-center font-bold text-sm flex-shrink-0">
-                      {p.name?.slice(0, 2).toUpperCase() || 'P'}
+              <div className="flex flex-col gap-4">
+                {/* Grouped squads if set */}
+                {(sc.teamAPlayers?.length > 0 || sc.teamBPlayers?.length > 0) ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-[var(--surface-container-low)] p-4 rounded-2xl flex flex-col gap-3">
+                      <div className="m3-title-md font-bold text-[var(--primary)] border-b border-[var(--outline-variant)] pb-2 flex justify-between items-center">
+                        <span>Team A ({sc.battingTeam === 'Team A' ? sc.battingTeam : sc.bowlingTeam})</span>
+                        {sc.teamACaptain && (
+                          <span className="text-[11px] text-amber-500 font-normal">
+                            👑 Captain: {yesAttendees.find(p => p.userId === sc.teamACaptain)?.name || 'Captain'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {sc.teamAPlayers?.map(id => {
+                          const p = yesAttendees.find(player => player.userId === id);
+                          if (!p) return null;
+                          return (
+                            <div key={id} className="flex items-center gap-2.5 p-1 rounded-xl">
+                              <div className="w-8 h-8 rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)] flex items-center justify-center font-bold text-xs">
+                                {p.name?.slice(0, 2).toUpperCase() || 'P'}
+                              </div>
+                              <span className="m3-title-sm font-semibold">{p.name}</span>
+                              {sc.teamACaptain === id && <span className="text-[10px] text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded-full ml-auto">Captain</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="m3-title-sm font-semibold">{p.name}</div>
-                      <div className="m3-label-md text-[var(--on-surface-variant)]">Player</div>
+
+                    <div className="bg-[var(--surface-container-low)] p-4 rounded-2xl flex flex-col gap-3">
+                      <div className="m3-title-md font-bold text-[var(--primary)] border-b border-[var(--outline-variant)] pb-2 flex justify-between items-center">
+                        <span>Team B ({sc.battingTeam === 'Team B' ? sc.battingTeam : sc.bowlingTeam})</span>
+                        {sc.teamBCaptain && (
+                          <span className="text-[11px] text-amber-500 font-normal">
+                            👑 Captain: {yesAttendees.find(p => p.userId === sc.teamBCaptain)?.name || 'Captain'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {sc.teamBPlayers?.map(id => {
+                          const p = yesAttendees.find(player => player.userId === id);
+                          if (!p) return null;
+                          return (
+                            <div key={id} className="flex items-center gap-2.5 p-1 rounded-xl">
+                              <div className="w-8 h-8 rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)] flex items-center justify-center font-bold text-xs">
+                                {p.name?.slice(0, 2).toUpperCase() || 'P'}
+                              </div>
+                              <span className="m3-title-sm font-semibold">{p.name}</span>
+                              {sc.teamBCaptain === id && <span className="text-[10px] text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded-full ml-auto">Captain</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <Chip
-                      tone={p.status === 'yes' ? 'success' : p.status === 'no' ? 'error' : 'warning'}
-                      size="sm"
-                      icon={p.status === 'yes' ? Check : p.status === 'no' ? X : HelpCircle}
-                    >
-                      {p.status === 'yes' ? 'In' : p.status === 'no' ? 'Out' : 'Pending'}
-                    </Chip>
                   </div>
-                ))}
+                ) : null}
+
+                {/* All RSVPs flat list */}
+                <div className="grid gap-1 bg-[var(--surface-container-low)] rounded-2xl overflow-hidden p-1">
+                  <div className="m3-label-sm text-[var(--on-surface-variant)] px-2.5 py-1.5 uppercase font-bold tracking-wide">
+                    All RSVP Responses
+                  </div>
+                  {match.rsvps?.map(p => (
+                    <div key={p.userId} className="flex items-center gap-3 p-2.5 rounded-xl">
+                      <div className="w-9 h-9 rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)] flex items-center justify-center font-bold text-sm flex-shrink-0">
+                        {p.name?.slice(0, 2).toUpperCase() || 'P'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="m3-title-sm font-semibold">{p.name}</div>
+                        <div className="m3-label-md text-[var(--on-surface-variant)]">
+                          {p.status === 'yes' ? (
+                            sc.teamAPlayers?.includes(p.userId) ? 'Team A Squad' : sc.teamBPlayers?.includes(p.userId) ? 'Team B Squad' : 'Attending'
+                          ) : 'Declined'}
+                        </div>
+                      </div>
+                      <Chip
+                        tone={p.status === 'yes' ? 'success' : p.status === 'no' ? 'error' : 'warning'}
+                        size="sm"
+                        icon={p.status === 'yes' ? Check : p.status === 'no' ? X : HelpCircle}
+                      >
+                        {p.status === 'yes' ? 'In' : p.status === 'no' ? 'Out' : 'Pending'}
+                      </Chip>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

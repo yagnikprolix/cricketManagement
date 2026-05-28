@@ -359,6 +359,12 @@ function LiveStadiumContent() {
                 <span>Overs: <strong className="text-[var(--on-surface)] text-[20px]">{sc.overs}.{sc.balls}</strong></span>
                 {target > 0 && <span><Target size={20} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> Target: <strong className="text-[var(--on-surface)] text-[20px]">{target}</strong></span>}
               </div>
+
+              {sc.tossWinner && (
+                <div className="mt-4 pt-4 border-t border-[var(--outline-variant)] text-[14px] text-amber-500 font-medium flex items-center gap-1">
+                  🪙 <strong>{sc.tossWinner === 'Team A' ? (sc.battingTeam || 'Team A') : sc.tossWinner === 'Team B' ? (sc.bowlingTeam || 'Team B') : sc.tossWinner}</strong> won the toss & elected to <strong>{sc.tossDecision === 'bat' ? 'bat' : 'bowl'}</strong> first.
+                </div>
+              )}
             </div>
 
             {/* Active Players Bar */}
@@ -583,6 +589,58 @@ function LiveStadiumContent() {
               {/* Full Scorecard Tab Content */}
               {activeLiveTab === 'scorecard' && (
                 <div className="flex flex-col gap-6 max-h-[500px] overflow-y-auto pr-2 no-scrollbar pb-4">
+                  {/* Divided Squads and Captains banner */}
+                  {(sc.teamAPlayers?.length > 0 || sc.teamBPlayers?.length > 0) && (
+                    <div className="bg-[var(--surface-container)] p-5 rounded-2xl flex flex-col gap-4 border border-[var(--outline-variant)]">
+                      <h4 className="text-[13px] text-[var(--on-surface)] uppercase tracking-wide font-bold border-b border-[var(--outline-variant)] pb-2 flex items-center gap-1.5">
+                        👥 Divided Match Squads
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="flex flex-col gap-2">
+                          <h5 className="text-[14px] text-[var(--primary)] font-bold flex items-center gap-1">
+                            Team A ({sc.battingTeam === 'Team A' ? sc.battingTeam : sc.bowlingTeam})
+                            {sc.teamACaptain && (
+                              <span className="text-[11px] text-amber-500 font-normal ml-1">
+                                (👑 Captain: {yesAttendees.find(p => p.userId === sc.teamACaptain)?.name || 'Captain'})
+                              </span>
+                            )}
+                          </h5>
+                          <ul className="text-[13px] text-[var(--on-surface-variant)] list-disc pl-5 flex flex-col gap-1">
+                            {sc.teamAPlayers?.map(id => {
+                              const isCaptain = sc.teamACaptain === id;
+                              return (
+                                <li key={id} className={isCaptain ? 'text-amber-500 font-medium' : ''}>
+                                  {yesAttendees.find(p => p.userId === id)?.name || 'Player'}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <h5 className="text-[14px] text-[var(--primary)] font-bold flex items-center gap-1">
+                            Team B ({sc.battingTeam === 'Team B' ? sc.battingTeam : sc.bowlingTeam})
+                            {sc.teamBCaptain && (
+                              <span className="text-[11px] text-amber-500 font-normal ml-1">
+                                (👑 Captain: {yesAttendees.find(p => p.userId === sc.teamBCaptain)?.name || 'Captain'})
+                              </span>
+                            )}
+                          </h5>
+                          <ul className="text-[13px] text-[var(--on-surface-variant)] list-disc pl-5 flex flex-col gap-1">
+                            {sc.teamBPlayers?.map(id => {
+                              const isCaptain = sc.teamBCaptain === id;
+                              return (
+                                <li key={id} className={isCaptain ? 'text-amber-500 font-medium' : ''}>
+                                  {yesAttendees.find(p => p.userId === id)?.name || 'Player'}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <h4 className="text-[13px] text-[var(--primary)] mb-2 uppercase tracking-wide font-bold">Batting Roster</h4>
                     {sc.batsmenStats && sc.batsmenStats.length > 0 ? (
@@ -602,7 +660,9 @@ function LiveStadiumContent() {
                           <tbody className="divide-y divide-[var(--outline-variant)]">
                             {sc.batsmenStats.map((b) => (
                               <tr key={b.userId || b.name} className="hover:bg-[var(--surface-container-highest)] transition-colors">
-                                <td className="p-3 font-bold text-[var(--on-surface)]">{b.name}</td>
+                                <td className="p-3 font-bold text-[var(--on-surface)]">
+                                  {b.name} {(sc.teamACaptain === b.userId || sc.teamBCaptain === b.userId) ? ' (c)' : ''}
+                                </td>
                                 <td className="p-3 text-[var(--on-surface-variant)]">{b.dismissalInfo}</td>
                                 <td className="p-3 font-bold text-[var(--on-surface)]">{b.runs}</td>
                                 <td className="p-3 text-[var(--on-surface)]">{b.balls}</td>
@@ -638,7 +698,9 @@ function LiveStadiumContent() {
                               const econ = totalBowlerBalls > 0 ? ((bo.runsConceded / totalBowlerBalls) * 6).toFixed(2) : '0.00';
                               return (
                                 <tr key={bo.userId || bo.name} className="hover:bg-[var(--surface-container-highest)] transition-colors">
-                                  <td className="p-3 font-bold text-[var(--on-surface)]">{bo.name}</td>
+                                  <td className="p-3 font-bold text-[var(--on-surface)]">
+                                    {bo.name} {(sc.teamACaptain === bo.userId || sc.teamBCaptain === bo.userId) ? ' (c)' : ''}
+                                  </td>
                                   <td className="p-3 text-[var(--on-surface)]">{bo.overs}.{bo.balls}</td>
                                   <td className="p-3 text-[var(--on-surface)]">{bo.runsConceded}</td>
                                   <td className="p-3 font-bold text-[var(--primary)]">{bo.wickets}</td>

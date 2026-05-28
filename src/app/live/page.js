@@ -2,6 +2,12 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import AppBar from '@/components/ui/AppBar';
+import Tabs from '@/components/ui/Tabs';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Loader from '@/components/ui/Loader';
+import { ArrowLeft, Radio, Trophy, Activity, User, CircleDot, Mic, MicOff, MapPin, Table, LineChart, Target, Volume2, VolumeX } from 'lucide-react';
 
 function LiveStadiumContent() {
   const router = useRouter();
@@ -195,31 +201,22 @@ function LiveStadiumContent() {
   };
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-          <div className="loading-spinner" />
-          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '16px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Entering Stadium Hub...</p>
-        </div>
-      </div>
-    );
+    return <Loader text="Entering Stadium Hub..." fullScreen />;
   }
 
   // Visual placeholders if no match is currently running or scheduled
   if (!activeMatch) {
     return (
-      <div style={{ background: '#060913', minHeight: '100vh', color: 'var(--text-main)', display: 'flex', flexDirection: 'column' }}>
-        <nav className="navbar">
-          <div className="nav-brand"><img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Live Stadium Portal</div>
-          <div className="nav-links">
-            <button onClick={() => router.push('/')} className="btn btn-secondary">Back to Dashboard</button>
-          </div>
-        </nav>
-        <main className="main-wrapper" style={{ paddingTop: '120px', display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-          <div className="glass-card text-center p-30" style={{ maxWidth: '600px' }}>
-            <span style={{ fontSize: '64px' }}>📡</span>
-            <h2 style={{ color: 'white', fontSize: '24px', marginTop: '20px', marginBottom: '8px' }}>Stadium Screens Off</h2>
-            <p style={{ color: 'var(--text-muted)' }}>
+      <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--on-background)]">
+        <AppBar 
+          title="Live Stadium Portal"
+          leading={<IconButton icon={ArrowLeft} onClick={() => router.push('/')} />}
+        />
+        <main className="flex-1 flex justify-center items-center p-6">
+          <div className="bg-[var(--surface-container-low)] rounded-[32px] p-10 max-w-[600px] w-full text-center shadow-[var(--el-1)]">
+            <Radio size={64} className="text-[var(--primary)] mb-5 mx-auto" />
+            <h2 className="text-[24px] text-[var(--on-surface)] mt-5 mb-2 font-bold">Stadium Screens Off</h2>
+            <p className="text-[var(--on-surface-variant)]">
               No matches have been logged or scheduled inside the database yet. When an admin starts scoring, live updates will appear here!
             </p>
           </div>
@@ -268,141 +265,142 @@ function LiveStadiumContent() {
       const isDot = comm.runs === 0 && !isWicket;
       const isExtra = descUpper.includes('EXTRA') || descUpper.includes('WIDE') || descUpper.includes('NO BALL');
       
-      let bubbleClass = 'ball-run';
+      let bubbleClass = 'bg-[var(--surface-container-high)] text-[var(--on-surface)] shadow-sm';
       let displayText = comm.runs;
 
       if (isWicket) {
-        bubbleClass = 'ball-wicket';
+        bubbleClass = 'bg-[var(--error)] text-[var(--on-error)] shadow-md';
         displayText = 'W';
       } else if (isFour) {
-        bubbleClass = 'ball-boundary-four';
+        bubbleClass = 'bg-[#10b981] text-[#ffffff] shadow-sm';
         displayText = '4';
       } else if (isSix) {
-        bubbleClass = 'ball-boundary-six';
+        bubbleClass = 'bg-[var(--primary)] text-[var(--on-primary)] shadow-md';
         displayText = '6';
       } else if (isDot) {
-        bubbleClass = 'ball-dot';
+        bubbleClass = 'bg-[var(--surface-container)] text-[var(--on-surface-variant)] border border-[var(--outline-variant)]';
         displayText = '•';
       } else if (isExtra) {
-        bubbleClass = 'ball-extra';
+        bubbleClass = 'bg-[var(--secondary-container)] text-[var(--on-secondary-container)] shadow-sm';
         displayText = comm.runs + 'ex';
       }
 
       return (
-        <span key={comm._id || idx} className={`ball-bubble ${bubbleClass}`} title={comm.description}>
+        <span key={comm._id || idx} className={`flex items-center justify-center w-[34px] h-[34px] rounded-full text-[13px] font-black shrink-0 ${bubbleClass}`} title={comm.description}>
           {displayText}
         </span>
       );
     });
 
   return (
-    <div style={{ background: '#060913', minHeight: '100vh', color: 'var(--text-main)' }}>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--on-background)] pb-12">
       
-      <nav className="navbar">
-        <div className="nav-brand">
-          <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Stadium Live Matchcast
-        </div>
-        <div className="nav-links">
-          {user && <span className="user-badge" style={{ fontSize: '11px' }}>Attending: {user.name}</span>}
-          <button onClick={() => router.push('/')} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '13px' }}>
-            Player Dashboard
-          </button>
-        </div>
-      </nav>
+      <AppBar 
+        title="Stadium Live Matchcast"
+        leading={<IconButton icon={ArrowLeft} onClick={() => router.push('/')} />}
+        actions={
+          <div className="flex items-center gap-2 pr-2">
+            {user && <span className="hidden md:inline text-[12px] text-[var(--on-surface-variant)] mr-2">Attending: {user.name}</span>}
+            <Button variant="tonal" size="sm" onClick={() => router.push('/')}>
+              Player Dashboard
+            </Button>
+          </div>
+        }
+      />
 
-      <main className="main-wrapper" style={{ paddingTop: '100px' }}>
+      <main className="main-wrapper" style={{ paddingTop: '20px' }}>
         
         {/* Dynamic TV Scoreboard Ticker */}
         {sc.status === 'live' && (
           <div className="ticker-wrap" style={{ position: 'fixed', top: '70px', left: 0, right: 0, zIndex: 99 }}>
             <div className="ticker-track">
               <div className="ticker-content">
-                <span className="ticker-item">🏆 LIVE: <span>{activeMatch.title}</span></span>
-                <span className="ticker-item">🏏 SCORE: <strong>{sc.runs}/{sc.wickets}</strong> <span>({sc.overs}.{sc.balls} ov)</span></span>
-                {sc.activeStriker?.name && <span className="ticker-item">🏏 Striker: <strong>{sc.activeStriker.name}*</strong> ({sc.activeStriker.runs} runs)</span>}
-                {sc.activeBowler?.name && <span className="ticker-item">🔴 Bowler: <strong>{sc.activeBowler.name}</strong> ({sc.activeBowler.wickets}/{sc.activeBowler.runsConceded})</span>}
-                {sc.commentary && sc.commentary.length > 0 && <span className="ticker-item">🎙️ Last Ball: <span>{sc.commentary[0].description}</span></span>}
+                <span className="ticker-item"><Trophy size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> LIVE: <span>{activeMatch.title}</span></span>
+                <span className="ticker-item"><Activity size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> SCORE: <strong>{sc.runs}/{sc.wickets}</strong> <span>({sc.overs}.{sc.balls} ov)</span></span>
+                {sc.activeStriker?.name && <span className="ticker-item"><User size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> Striker: <strong>{sc.activeStriker.name}*</strong> ({sc.activeStriker.runs} runs)</span>}
+                {sc.activeBowler?.name && <span className="ticker-item"><CircleDot size={14} className="inline mr-1 mb-0.5 text-[var(--error)]"/> Bowler: <strong>{sc.activeBowler.name}</strong> ({sc.activeBowler.wickets}/{sc.activeBowler.runsConceded})</span>}
+                {sc.commentary && sc.commentary.length > 0 && <span className="ticker-item"><Mic size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> Last Ball: <span>{sc.commentary[0].description}</span></span>}
               </div>
               <div className="ticker-content" aria-hidden="true">
-                <span className="ticker-item">🏆 LIVE: <span>{activeMatch.title}</span></span>
-                <span className="ticker-item">🏏 SCORE: <strong>{sc.runs}/{sc.wickets}</strong> <span>({sc.overs}.{sc.balls} ov)</span></span>
-                {sc.activeStriker?.name && <span className="ticker-item">🏏 Striker: <strong>{sc.activeStriker.name}*</strong> ({sc.activeStriker.runs} runs)</span>}
-                {sc.activeBowler?.name && <span className="ticker-item">🔴 Bowler: <strong>{sc.activeBowler.name}</strong> ({sc.activeBowler.wickets}/{sc.activeBowler.runsConceded})</span>}
-                {sc.commentary && sc.commentary.length > 0 && <span className="ticker-item">🎙️ Last Ball: <span>{sc.commentary[0].description}</span></span>}
+                <span className="ticker-item"><Trophy size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> LIVE: <span>{activeMatch.title}</span></span>
+                <span className="ticker-item"><Activity size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> SCORE: <strong>{sc.runs}/{sc.wickets}</strong> <span>({sc.overs}.{sc.balls} ov)</span></span>
+                {sc.activeStriker?.name && <span className="ticker-item"><User size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> Striker: <strong>{sc.activeStriker.name}*</strong> ({sc.activeStriker.runs} runs)</span>}
+                {sc.activeBowler?.name && <span className="ticker-item"><CircleDot size={14} className="inline mr-1 mb-0.5 text-[var(--error)]"/> Bowler: <strong>{sc.activeBowler.name}</strong> ({sc.activeBowler.wickets}/{sc.activeBowler.runsConceded})</span>}
+                {sc.commentary && sc.commentary.length > 0 && <span className="ticker-item"><Mic size={14} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> Last Ball: <span>{sc.commentary[0].description}</span></span>}
               </div>
             </div>
           </div>
         )}
 
-        <div className="grid-2 mt-20" style={{ gap: '30px', alignItems: 'flex-start', paddingTop: sc.status === 'live' ? '45px' : '0' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 max-w-[1200px] mx-auto mt-8" style={{ paddingTop: sc.status === 'live' ? '45px' : '0' }}>
           
           {/* Main Visual Scoreboard Panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="flex flex-col gap-6">
             
-            <div className="scoreboard-display" style={{ padding: '30px', background: 'linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(0,0,0,0.4) 100%)', border: '2px solid rgba(16, 185, 129, 0.25)', boxShadow: '0 15px 35px rgba(0,0,0,0.4)' }}>
-              <div className="flex-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', marginBottom: '15px' }}>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <div className="bg-[var(--surface-container-high)] rounded-[32px] p-8 shadow-[var(--el-1)]">
+              <div className="flex justify-between items-center border-b border-[var(--outline-variant)] pb-3 mb-5">
+                <span className="text-[13px] font-bold text-[var(--primary)] uppercase tracking-wider">
                   {sc.battingTeam} Batting
                 </span>
                 {sc.status === 'live' ? (
-                  <span className="live-badge-pulse" style={{ padding: '4px 8px', fontSize: '10px' }}>LIVE MATCHCAST</span>
+                  <span className="bg-[var(--live)] text-[var(--on-live)] px-3 py-1 rounded-full text-[10px] font-bold tracking-widest animate-pulse">LIVE MATCHCAST</span>
                 ) : sc.status === 'completed' ? (
-                  <span className="user-badge" style={{ background: 'rgba(255,255,255,0.1)', color: 'white' }}>🏁 FINISHED</span>
+                  <span className="bg-[var(--surface-container-highest)] text-[var(--on-surface-variant)] px-3 py-1 rounded-full text-[10px] font-bold tracking-widest">FINISHED</span>
                 ) : (
-                  <span className="user-badge" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>📅 SCHEDULED</span>
+                  <span className="bg-[var(--surface-container-highest)] text-[var(--on-surface-variant)] px-3 py-1 rounded-full text-[10px] font-bold tracking-widest">SCHEDULED</span>
                 )}
               </div>
 
-              <div className="score-main" style={{ fontSize: '64px', fontWeight: '900', textShadow: '0 0 20px rgba(16, 185, 129, 0.3)' }}>
+              <div className="text-[64px] font-black text-[var(--on-surface)] leading-tight">
                 {sc.runs} / {sc.wickets}
               </div>
 
-              <div className="score-sub" style={{ fontSize: '16px', display: 'flex', gap: '20px', color: 'var(--text-muted)' }}>
-                <span>Overs: <strong style={{ color: 'white', fontSize: '20px' }}>{sc.overs}.{sc.balls}</strong></span>
-                {target > 0 && <span>🎯 Target: <strong style={{ color: 'white', fontSize: '20px' }}>{target}</strong></span>}
+              <div className="flex gap-6 text-[16px] text-[var(--on-surface-variant)] mt-2">
+                <span>Overs: <strong className="text-[var(--on-surface)] text-[20px]">{sc.overs}.{sc.balls}</strong></span>
+                {target > 0 && <span><Target size={20} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> Target: <strong className="text-[var(--on-surface)] text-[20px]">{target}</strong></span>}
               </div>
             </div>
 
             {/* Active Players Bar */}
-            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="flex-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+            <div className="bg-[var(--surface-container-low)] p-6 rounded-[32px] flex flex-col gap-4 shadow-[var(--el-1)]">
+              <div className="flex justify-between border-b border-[var(--outline-variant)] pb-2">
                 <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Batter (Striker)</span>
+                  <span className="text-[var(--on-surface-variant)] text-[10px] uppercase block mb-1">Batter (Striker)</span>
                   {sc.activeStriker?.name ? (
-                    <strong style={{ color: 'var(--color-primary)', fontSize: '15px' }}>
-                      🏏 {sc.activeStriker.name}* <span style={{ color: 'white', marginLeft: '5px' }}>{sc.activeStriker.runs} ({sc.activeStriker.balls}b)</span>
+                    <strong className="text-[var(--primary)] text-[15px]">
+                      <User size={15} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> {sc.activeStriker.name}* <span className="text-[var(--on-surface)] ml-1">{sc.activeStriker.runs} ({sc.activeStriker.balls}b)</span>
                     </strong>
                   ) : (
-                    <span style={{ color: 'var(--text-muted)', fontSize: '13px', fontStyle: 'italic' }}>Selecting striker...</span>
+                    <span className="text-[var(--on-surface-variant)] text-[13px] italic">Selecting striker...</span>
                   )}
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Batter (Non-Striker)</span>
+                <div className="text-right">
+                  <span className="text-[var(--on-surface-variant)] text-[10px] uppercase block mb-1">Batter (Non-Striker)</span>
                   {sc.activeNonStriker?.name ? (
-                    <strong style={{ color: 'white', fontSize: '15px' }}>
-                      {sc.activeNonStriker.name} <span style={{ marginLeft: '5px' }}>{sc.activeNonStriker.runs} ({sc.activeNonStriker.balls}b)</span>
+                    <strong className="text-[var(--on-surface)] text-[15px]">
+                      {sc.activeNonStriker.name} <span className="ml-1">{sc.activeNonStriker.runs} ({sc.activeNonStriker.balls}b)</span>
                     </strong>
                   ) : (
-                    <span style={{ color: 'var(--text-muted)', fontSize: '13px', fontStyle: 'italic' }}>Selecting non-striker...</span>
+                    <span className="text-[var(--on-surface-variant)] text-[13px] italic">Selecting non-striker...</span>
                   )}
                 </div>
               </div>
 
-              <div className="flex-between">
+              <div className="flex justify-between">
                 <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Active Bowler</span>
+                  <span className="text-[var(--on-surface-variant)] text-[10px] uppercase block mb-1">Active Bowler</span>
                   {sc.activeBowler?.name ? (
-                    <strong style={{ color: 'white', fontSize: '14px' }}>
-                      🔴 {sc.activeBowler.name}
+                    <strong className="text-[var(--on-surface)] text-[14px]">
+                      <CircleDot size={15} className="inline mr-1 mb-0.5 text-[var(--error)]"/> {sc.activeBowler.name}
                     </strong>
                   ) : (
-                    <span style={{ color: 'var(--text-muted)', fontSize: '13px', fontStyle: 'italic' }}>Selecting bowler...</span>
+                    <span className="text-[var(--on-surface-variant)] text-[13px] italic">Selecting bowler...</span>
                   )}
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div className="text-right">
                   {sc.activeBowler?.name && (
-                    <strong style={{ color: 'var(--color-secondary)', fontSize: '15px' }}>
-                      {sc.activeBowler.wickets} / {sc.activeBowler.runsConceded} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 'normal' }}>({sc.activeBowler.overs}.{sc.activeBowler.balls} ov)</span>
+                    <strong className="text-[var(--primary)] text-[15px]">
+                      {sc.activeBowler.wickets} / {sc.activeBowler.runsConceded} <span className="text-[12px] text-[var(--on-surface-variant)] font-normal">({sc.activeBowler.overs}.{sc.activeBowler.balls} ov)</span>
                     </strong>
                   )}
                 </div>
@@ -410,36 +408,26 @@ function LiveStadiumContent() {
             </div>
 
             {/* Recent Deliveries row */}
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '16px', borderRadius: '10px', border: '1px solid var(--card-border)' }}>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Recent Deliveries (Last 10 Balls)</span>
+            <div className="bg-[var(--surface-container-highest)] p-6 rounded-[32px] shadow-[var(--el-1)]">
+              <span className="text-[11px] text-[var(--on-surface-variant)] uppercase block mb-2 font-bold tracking-wide">Recent Deliveries (Last 10 Balls)</span>
               {recentBallsBubbles.length > 0 ? (
-                <div className="recent-balls-container">{recentBallsBubbles}</div>
+                <div className="flex gap-2 flex-wrap">{recentBallsBubbles}</div>
               ) : (
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Waiting for the first delivery...</span>
+                <span className="text-[12px] text-[var(--on-surface-variant)] italic">Waiting for the first delivery...</span>
               )}
             </div>
 
             {/* List other matches sidebar */}
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-              <h3 style={{ fontSize: '14px', color: 'white', marginBottom: '12px', textTransform: 'uppercase' }}>Other Club matches</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '180px', overflowY: 'auto' }}>
+            <div className="bg-[var(--surface-container-low)] p-6 rounded-[32px] shadow-[var(--el-1)]">
+              <h3 className="text-[14px] text-[var(--on-surface)] mb-3 uppercase font-bold tracking-wide">Other Club matches</h3>
+              <div className="flex flex-col gap-3 max-h-[180px] overflow-y-auto no-scrollbar">
                 {matches.filter(m => m._id !== activeMatch._id).map(m => (
-                  <div key={m._id} onClick={() => router.push(`/live?matchId=${m._id}`)} style={{
-                    padding: '10px 14px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.02)',
-                    background: 'rgba(0,0,0,0.1)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    transition: 'var(--transition-smooth)'
-                  }} className="other-match-card-hover">
+                  <div key={m._id} onClick={() => router.push(`/live?matchId=${m._id}`)} className="p-3 rounded-2xl bg-[var(--surface-container)] hover:bg-[var(--surface-container-highest)] cursor-pointer flex justify-between items-center transition-colors">
                     <div>
-                      <strong style={{ fontSize: '13px', color: 'white' }}>{m.title}</strong>
-                      <span style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)' }}>📍 {m.location}</span>
+                      <strong className="text-[13px] text-[var(--on-surface)]">{m.title}</strong>
+                      <span className="block text-[11px] text-[var(--on-surface-variant)] mt-1"><MapPin size={12} className="inline mr-1 mb-0.5 text-[var(--primary)]"/> {m.location}</span>
                     </div>
-                    <span className="user-badge" style={{ fontSize: '10px' }}>{m.scorecard?.status}</span>
+                    <span className="bg-[var(--surface-container-high)] text-[var(--on-surface-variant)] px-2 py-1 rounded-md text-[10px] uppercase font-bold">{m.scorecard?.status}</span>
                   </div>
                 ))}
               </div>
@@ -448,31 +436,31 @@ function LiveStadiumContent() {
           </div>
 
           {/* Interactive Commentary Feed and Text-to-Speech Control Center */}
-          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             
             {/* Premium TTS Audio Announcer Card */}
-            <div className="glass-card p-20" style={{ border: '1px solid rgba(14, 165, 233, 0.3)', background: 'linear-gradient(135deg, rgba(14,165,233,0.04) 0%, rgba(9,13,22,0.6) 100%)', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '150px', height: '150px', background: 'rgba(14, 165, 233, 0.08)', borderRadius: '50%', filter: 'blur(50px)', zIndex: 0 }} />
+            <div className="bg-[var(--surface-container-low)] p-6 rounded-[24px] relative overflow-hidden shadow-[var(--el-1)]">
+              <div className="absolute -top-16 -right-16 w-32 h-32 bg-[var(--primary)] opacity-10 rounded-full blur-3xl z-0" />
               
-              <div className="flex-between" style={{ zIndex: 1, position: 'relative' }}>
+              <div className="flex justify-between items-center z-10 relative">
                 <div>
-                  <h3 style={{ color: 'white', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    🎙️ Stadium Voice Commentary
+                  <h3 className="text-[var(--on-surface)] text-[16px] font-bold flex items-center gap-2">
+                    <Mic size={18} className="text-[var(--primary)]"/> Stadium Voice Commentary
                   </h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '2px' }}>
+                  <p className="text-[var(--on-surface-variant)] text-[12px] mt-1">
                     Speak dynamically generated commentary sentences out loud in real time!
                   </p>
                 </div>
                 
                 {/* Visual Speaking Equalizer Animation */}
                 {isSpeaking && (
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '18px', width: '25px' }}>
+                  <div className="flex items-end gap-[3px] h-[18px] w-[25px]">
                     <div className="eq-bar eq-bar-1" />
                     <div className="eq-bar eq-bar-2" />
                     <div className="eq-bar eq-bar-3" />
                     <div className="eq-bar eq-bar-4" />
                     <style>{`
-                      .eq-bar { width: 3px; background: var(--color-primary); border-radius: 1px; }
+                      .eq-bar { width: 3px; background: var(--primary); border-radius: 1px; }
                       .eq-bar-1 { height: 10px; animation: eq 0.6s ease infinite alternate; }
                       .eq-bar-2 { height: 15px; animation: eq 0.8s ease infinite alternate 0.15s; }
                       .eq-bar-3 { height: 8px; animation: eq 0.5s ease infinite alternate 0.3s; }
@@ -483,36 +471,25 @@ function LiveStadiumContent() {
                 )}
               </div>
 
-              <div className="flex-between mt-20" style={{ zIndex: 1, position: 'relative', gap: '15px' }}>
-                <button
+              <div className="flex mt-6 z-10 relative gap-4">
+                <Button
                   onClick={toggleAudio}
-                  className={`btn ${audioEnabled ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{
-                    flex: 1,
-                    padding: '10px',
-                    fontWeight: '700',
-                    background: audioEnabled ? 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' : 'rgba(255,255,255,0.03)',
-                    border: audioEnabled ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                    color: 'white',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
+                  variant={audioEnabled ? 'filled' : 'tonal'}
+                  icon={audioEnabled ? Volume2 : VolumeX}
+                  full
                 >
-                  {audioEnabled ? '🔊 Live Audio Voice Active' : '🔇 Turn Live Audio Voice ON'}
-                </button>
+                  {audioEnabled ? 'Live Audio Voice Active' : 'Turn Live Audio Voice ON'}
+                </Button>
               </div>
 
               {audioEnabled && (
-                <div className="mt-16" style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '12px', zIndex: 1, position: 'relative', fontSize: '11px' }}>
-                  <div className="form-group" style={{ marginBottom: '0' }}>
-                    <label className="form-label" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Choose Voice Engine</label>
+                <div className="mt-6 flex flex-col gap-4 border-t border-[var(--outline-variant)] pt-4 z-10 relative text-[11px]">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[11px] text-[var(--on-surface-variant)] font-bold uppercase tracking-wide">Choose Voice Engine</label>
                     <select
-                      className="form-input"
+                      className="h-[40px] px-3 rounded-xl bg-[var(--surface-container-high)] border-transparent text-[13px] text-[var(--on-surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] focus:outline-none"
                       value={selectedVoiceName}
                       onChange={(e) => setSelectedVoiceName(e.target.value)}
-                      style={{ padding: '6px 10px', fontSize: '12px', background: '#0b0f19', border: '1px solid rgba(255,255,255,0.08)' }}
                     >
                       {availableVoices.map(v => (
                         <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>
@@ -520,9 +497,9 @@ function LiveStadiumContent() {
                     </select>
                   </div>
 
-                  <div className="grid-2" style={{ gap: '10px', marginBottom: '0' }}>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Speech Rate: {speechRate}x</span>
+                      <span className="text-[var(--on-surface-variant)] block mb-1">Speech Rate: {speechRate}x</span>
                       <input
                         type="range"
                         min="0.6"
@@ -530,11 +507,11 @@ function LiveStadiumContent() {
                         step="0.1"
                         value={speechRate}
                         onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
-                        style={{ width: '100%', accentColor: '#0ea5e9' }}
+                        className="w-full accent-[var(--primary)]"
                       />
                     </div>
                     <div>
-                      <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Pitch Level: {speechPitch}</span>
+                      <span className="text-[var(--on-surface-variant)] block mb-1">Pitch Level: {speechPitch}</span>
                       <input
                         type="range"
                         min="0.7"
@@ -542,7 +519,7 @@ function LiveStadiumContent() {
                         step="0.1"
                         value={speechPitch}
                         onChange={(e) => setSpeechPitch(parseFloat(e.target.value))}
-                        style={{ width: '100%', accentColor: '#0ea5e9' }}
+                        className="w-full accent-[var(--primary)]"
                       />
                     </div>
                   </div>
@@ -551,48 +528,52 @@ function LiveStadiumContent() {
             </div>
 
             {/* Stadium Navigation Tabs */}
-            <div style={{ width: '100%' }}>
-              <div className="live-tabs-nav" style={{ marginBottom: '15px' }}>
-                <button onClick={() => setActiveLiveTab('commentary')} className={`live-tab-btn ${activeLiveTab === 'commentary' ? 'active' : ''}`}>
-                  🎙️ Dynamic Commentary
-                </button>
-                <button onClick={() => setActiveLiveTab('scorecard')} className={`live-tab-btn ${activeLiveTab === 'scorecard' ? 'active' : ''}`}>
-                  📊 Team Scorecard
-                </button>
-                <button onClick={() => setActiveLiveTab('analytics')} className={`live-tab-btn ${activeLiveTab === 'analytics' ? 'active' : ''}`}>
-                  📈 Chase Analytics
-                </button>
-              </div>
+            <div className="w-full">
+              <Tabs
+                current={activeLiveTab}
+                onChange={setActiveLiveTab}
+                className="mb-6 shrink-0"
+                items={[
+                  { id: 'commentary', label: 'Dynamic Commentary', icon: Mic },
+                  { id: 'scorecard', label: 'Team Scorecard', icon: Table },
+                  { id: 'analytics', label: 'Chase Analytics', icon: LineChart }
+                ]}
+              />
 
               {/* Dynamic Commentary Tab Content */}
               {activeLiveTab === 'commentary' && (
-                <div style={{ maxHeight: '380px', overflowY: 'auto' }} className="commentary-container">
+                <div className="max-h-[500px] overflow-y-auto pr-2 flex flex-col gap-3 no-scrollbar pb-4">
                   {sc.commentary && sc.commentary.length > 0 ? (
                     sc.commentary.map((comm, idx) => {
                       const descUpper = comm.description?.toUpperCase() || '';
                       const isWicket = descUpper.includes('OUT!');
                       const isFour = comm.runs === 4 && !descUpper.includes('EXTRA');
                       const isSix = comm.runs === 6 && !descUpper.includes('EXTRA');
+                      
+                      let borderLeftColor = 'var(--primary)';
+                      if (isWicket) borderLeftColor = 'var(--error)';
+                      if (isFour || isSix) borderLeftColor = '#10b981'; // Green for boundaries
+                      
                       return (
-                        <div key={comm._id || idx} className="commentary-item" style={{ borderLeft: isWicket ? '4px solid var(--color-danger)' : isFour || isSix ? '4px solid var(--color-secondary)' : '4px solid var(--color-primary)' }}>
-                          <div className="flex-between" style={{ marginBottom: '4px' }}>
-                            <span className="commentary-ball" style={{ fontWeight: '800', color: 'white' }}>Ball {comm.ball}</span>
+                        <div key={comm._id || idx} className="bg-[var(--surface-container)] p-4 rounded-xl shadow-[var(--el-1)]" style={{ borderLeft: `4px solid ${borderLeftColor}` }}>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[13px] font-bold text-[var(--on-surface)]">Ball {comm.ball}</span>
                             {isWicket ? (
-                              <span className="badge-status badge-no" style={{ fontSize: '9px', padding: '1px 5px' }}>WICKET</span>
+                              <span className="bg-[var(--error-container)] text-[var(--on-error-container)] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">WICKET</span>
                             ) : isFour || isSix ? (
-                              <span className="badge-status badge-yes" style={{ fontSize: '9px', padding: '1px 5px', background: isFour ? 'rgba(16,185,129,0.1)' : 'rgba(14,165,233,0.1)', color: isFour ? 'var(--color-primary)' : 'var(--color-secondary)', border: isFour ? '1px solid var(--color-primary)' : '1px solid var(--color-secondary)' }}>
+                              <span className="bg-[#d1fae5] text-[#065f46] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
                                 {isFour ? 'FOUR' : 'SIX'}
                               </span>
                             ) : null}
                           </div>
-                          <p style={{ fontSize: '13px', lineHeight: '1.4', color: 'rgba(255,255,255,0.85)' }}>
-                            <strong style={{ color: 'white' }}>{comm.runs} Run(s)</strong> — {comm.description}
+                          <p className="text-[14px] text-[var(--on-surface-variant)]">
+                            <strong className="text-[var(--on-surface)]">{comm.runs} Run(s)</strong> — {comm.description}
                           </p>
                         </div>
                       );
                     })
                   ) : (
-                    <div style={{ padding: '40px 20px', textAlign: 'center', background: 'rgba(0,0,0,0.15)', borderRadius: '8px', color: 'var(--text-muted)', fontSize: '13px', fontStyle: 'italic' }}>
+                    <div className="p-10 text-center bg-[var(--surface-container)] rounded-2xl text-[var(--on-surface-variant)] text-[14px] italic">
                       Waiting for the umpire to record the opening delivery. Live commentary will stream dynamically here!
                     </div>
                   )}
@@ -601,67 +582,67 @@ function LiveStadiumContent() {
 
               {/* Full Scorecard Tab Content */}
               {activeLiveTab === 'scorecard' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '380px', overflowY: 'auto' }}>
+                <div className="flex flex-col gap-6 max-h-[500px] overflow-y-auto pr-2 no-scrollbar pb-4">
                   <div>
-                    <h4 style={{ fontSize: '13px', color: 'var(--color-primary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>Batting Roster</h4>
+                    <h4 className="text-[13px] text-[var(--primary)] mb-2 uppercase tracking-wide font-bold">Batting Roster</h4>
                     {sc.batsmenStats && sc.batsmenStats.length > 0 ? (
-                      <div className="custom-table-container">
-                        <table className="custom-table" style={{ fontSize: '12px' }}>
-                          <thead>
+                      <div className="overflow-x-auto rounded-2xl bg-[var(--surface-container)]">
+                        <table className="w-full text-left text-[13px] border-collapse">
+                          <thead className="bg-[var(--surface-container-high)] text-[var(--on-surface-variant)] border-b border-[var(--outline-variant)]">
                             <tr>
-                              <th style={{ padding: '8px 12px' }}>Batsman</th>
-                              <th style={{ padding: '8px 12px' }}>Dismissal Info</th>
-                              <th style={{ padding: '8px 12px' }}>Runs</th>
-                              <th style={{ padding: '8px 12px' }}>Balls</th>
-                              <th style={{ padding: '8px 12px' }}>4s</th>
-                              <th style={{ padding: '8px 12px' }}>6s</th>
-                              <th style={{ padding: '8px 12px' }}>SR</th>
+                              <th className="p-3 font-medium">Batsman</th>
+                              <th className="p-3 font-medium">Dismissal Info</th>
+                              <th className="p-3 font-medium">Runs</th>
+                              <th className="p-3 font-medium">Balls</th>
+                              <th className="p-3 font-medium">4s</th>
+                              <th className="p-3 font-medium">6s</th>
+                              <th className="p-3 font-medium">SR</th>
                             </tr>
                           </thead>
-                          <tbody>
+                          <tbody className="divide-y divide-[var(--outline-variant)]">
                             {sc.batsmenStats.map((b) => (
-                              <tr key={b.userId || b.name}>
-                                <td style={{ padding: '8px 12px' }}><strong>{b.name}</strong></td>
-                                <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{b.dismissalInfo}</td>
-                                <td style={{ padding: '8px 12px' }}>{b.runs}</td>
-                                <td style={{ padding: '8px 12px' }}>{b.balls}</td>
-                                <td style={{ padding: '8px 12px' }}>{b.fours}</td>
-                                <td style={{ padding: '8px 12px' }}>{b.sixes}</td>
-                                <td style={{ padding: '8px 12px' }}>{b.balls > 0 ? ((b.runs / b.balls) * 100).toFixed(1) : '0.0'}</td>
+                              <tr key={b.userId || b.name} className="hover:bg-[var(--surface-container-highest)] transition-colors">
+                                <td className="p-3 font-bold text-[var(--on-surface)]">{b.name}</td>
+                                <td className="p-3 text-[var(--on-surface-variant)]">{b.dismissalInfo}</td>
+                                <td className="p-3 font-bold text-[var(--on-surface)]">{b.runs}</td>
+                                <td className="p-3 text-[var(--on-surface)]">{b.balls}</td>
+                                <td className="p-3 text-[var(--on-surface)]">{b.fours}</td>
+                                <td className="p-3 text-[var(--on-surface)]">{b.sixes}</td>
+                                <td className="p-3 text-[var(--on-surface)]">{b.balls > 0 ? ((b.runs / b.balls) * 100).toFixed(1) : '0.0'}</td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
                     ) : (
-                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center' }}>No batting stats logged yet.</p>
+                      <p className="text-[12px] text-[var(--on-surface-variant)] italic text-center p-4 bg-[var(--surface-container)] rounded-xl">No batting stats logged yet.</p>
                     )}
                   </div>
                   <div>
-                    <h4 style={{ fontSize: '13px', color: 'var(--color-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>Bowling Roster</h4>
+                    <h4 className="text-[13px] text-[var(--primary)] mb-2 uppercase tracking-wide font-bold">Bowling Roster</h4>
                     {sc.bowlersStats && sc.bowlersStats.length > 0 ? (
-                      <div className="custom-table-container">
-                        <table className="custom-table" style={{ fontSize: '12px' }}>
-                          <thead>
+                      <div className="overflow-x-auto rounded-2xl bg-[var(--surface-container)]">
+                        <table className="w-full text-left text-[13px] border-collapse">
+                          <thead className="bg-[var(--surface-container-high)] text-[var(--on-surface-variant)] border-b border-[var(--outline-variant)]">
                             <tr>
-                              <th style={{ padding: '8px 12px' }}>Bowler</th>
-                              <th style={{ padding: '8px 12px' }}>Overs</th>
-                              <th style={{ padding: '8px 12px' }}>Runs</th>
-                              <th style={{ padding: '8px 12px' }}>Wickets</th>
-                              <th style={{ padding: '8px 12px' }}>Econ</th>
+                              <th className="p-3 font-medium">Bowler</th>
+                              <th className="p-3 font-medium">Overs</th>
+                              <th className="p-3 font-medium">Runs</th>
+                              <th className="p-3 font-medium">Wickets</th>
+                              <th className="p-3 font-medium">Econ</th>
                             </tr>
                           </thead>
-                          <tbody>
+                          <tbody className="divide-y divide-[var(--outline-variant)]">
                             {sc.bowlersStats.map((bo) => {
                               const totalBowlerBalls = (bo.overs || 0) * 6 + (bo.balls || 0);
                               const econ = totalBowlerBalls > 0 ? ((bo.runsConceded / totalBowlerBalls) * 6).toFixed(2) : '0.00';
                               return (
-                                <tr key={bo.userId || bo.name}>
-                                  <td style={{ padding: '8px 12px' }}><strong>{bo.name}</strong></td>
-                                  <td style={{ padding: '8px 12px' }}>{bo.overs}.{bo.balls}</td>
-                                  <td style={{ padding: '8px 12px' }}>{bo.runsConceded}</td>
-                                  <td style={{ padding: '8px 12px' }}><strong>{bo.wickets}</strong></td>
-                                  <td style={{ padding: '8px 12px' }}>{econ}</td>
+                                <tr key={bo.userId || bo.name} className="hover:bg-[var(--surface-container-highest)] transition-colors">
+                                  <td className="p-3 font-bold text-[var(--on-surface)]">{bo.name}</td>
+                                  <td className="p-3 text-[var(--on-surface)]">{bo.overs}.{bo.balls}</td>
+                                  <td className="p-3 text-[var(--on-surface)]">{bo.runsConceded}</td>
+                                  <td className="p-3 font-bold text-[var(--primary)]">{bo.wickets}</td>
+                                  <td className="p-3 text-[var(--on-surface)]">{econ}</td>
                                 </tr>
                               );
                             })}
@@ -669,7 +650,7 @@ function LiveStadiumContent() {
                         </table>
                       </div>
                     ) : (
-                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center' }}>No bowling stats logged yet.</p>
+                      <p className="text-[12px] text-[var(--on-surface-variant)] italic text-center p-4 bg-[var(--surface-container)] rounded-xl">No bowling stats logged yet.</p>
                     )}
                   </div>
                 </div>
@@ -677,39 +658,39 @@ function LiveStadiumContent() {
 
               {/* Analytics Tab Content */}
               {activeLiveTab === 'analytics' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  <div className="grid-2" style={{ gap: '15px' }}>
-                    <div className="stats-grid-card" style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--card-border)', borderRadius: '10px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Run Rate Meter</span>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginTop: '6px' }}>
-                        <span>Current Run Rate (CRR):</span>
-                        <strong style={{ color: 'var(--color-primary)', fontSize: '16px' }}>{crr}</strong>
+                <div className="max-h-[500px] overflow-y-auto pr-2 flex flex-col gap-4 no-scrollbar pb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-[var(--surface-container)] p-5 rounded-2xl">
+                      <span className="text-[11px] text-[var(--on-surface-variant)] uppercase font-bold tracking-wide">Run Rate Meter</span>
+                      <div className="flex justify-between items-center text-[13px] mt-3">
+                        <span className="text-[var(--on-surface)]">Current Run Rate (CRR):</span>
+                        <strong className="text-[var(--primary)] text-[16px]">{crr}</strong>
                       </div>
                       {target > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', marginTop: '8px', fontSize: '13px' }}>
-                          <span>Required Run Rate (RRR):</span>
-                          <strong style={{ color: 'var(--color-warning)', fontSize: '16px' }}>{rrr}</strong>
+                        <div className="flex justify-between items-center text-[13px] border-t border-[var(--outline-variant)] pt-3 mt-3">
+                          <span className="text-[var(--on-surface)]">Required Run Rate (RRR):</span>
+                          <strong className="text-[var(--warning)] text-[16px]">{rrr}</strong>
                         </div>
                       )}
                     </div>
 
-                    <div className="stats-grid-card" style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--card-border)', borderRadius: '10px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Partnership</span>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginTop: '6px' }}>
-                        <span>Batting Partnership:</span>
-                        <strong style={{ color: 'white', fontSize: '16px' }}>{activePartnership} runs</strong>
+                    <div className="bg-[var(--surface-container)] p-5 rounded-2xl">
+                      <span className="text-[11px] text-[var(--on-surface-variant)] uppercase font-bold tracking-wide">Partnership</span>
+                      <div className="flex justify-between items-center text-[13px] mt-3">
+                        <span className="text-[var(--on-surface)]">Batting Partnership:</span>
+                        <strong className="text-[var(--on-surface)] text-[16px]">{activePartnership} runs</strong>
                       </div>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic', display: 'block', marginTop: '4px' }}>
+                      <span className="text-[11px] text-[var(--on-surface-variant)] italic block mt-2">
                         {sc.activeStriker?.name || 'Striker'} & {sc.activeNonStriker?.name || 'Non-Striker'}
                       </span>
                     </div>
                   </div>
 
                   {target > 0 && (
-                    <div className="stats-grid-card" style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.04)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '10px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--color-warning)', textTransform: 'uppercase', fontWeight: '800' }}>Target Tracker</span>
-                      <div style={{ fontSize: '18px', color: 'white', fontWeight: '700', marginTop: '6px' }}>
-                        Need <span style={{ color: 'var(--color-warning)', fontSize: '22px' }}>{runsNeeded}</span> runs off <span style={{ color: 'var(--color-secondary)', fontSize: '22px' }}>{remainingBalls}</span> deliveries remaining!
+                    <div className="bg-[var(--warning-container)] p-6 rounded-2xl text-center">
+                      <span className="flex justify-center items-center gap-2 text-[12px] text-[var(--on-warning-container)] uppercase font-black tracking-wider"><Target size={14}/> Target Tracker</span>
+                      <div className="text-[20px] text-[var(--on-warning-container)] font-bold mt-2">
+                        Need <span className="text-[var(--warning)] text-[26px] mx-1">{runsNeeded}</span> runs off <span className="text-[var(--primary)] text-[26px] mx-1">{remainingBalls}</span> deliveries remaining!
                       </div>
                     </div>
                   )}
@@ -728,11 +709,7 @@ function LiveStadiumContent() {
 
 export default function LiveStadium() {
   return (
-    <Suspense fallback={
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#060913', color: 'var(--text-main)' }}>
-        <p>Loading Stadium Broadcast Engine...</p>
-      </div>
-    }>
+    <Suspense fallback={<Loader text="" fullScreen />}>
       <LiveStadiumContent />
     </Suspense>
   );

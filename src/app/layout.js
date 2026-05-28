@@ -1,4 +1,9 @@
 import './globals.css';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import BottomNav from '@/components/ui/BottomNav';
+import SideNav from '@/components/ui/SideNav';
+import MainLayout from '@/components/layout/MainLayout';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: 'Curius Cricket Club | Live Matches, RSVP & Payments',
@@ -37,7 +42,7 @@ export const metadata = {
     apple: '/curius-logo.png',
   },
   other: {
-    'theme-color': '#10b981',
+    'theme-color': '#4F46E5',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
   },
@@ -49,10 +54,41 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <meta name="theme-color" content="#10b981" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..200&display=block" />
+        <meta name="theme-color" content="#4F46E5" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('curius-theme');
+                  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
-      <body>
-        {children}
+      <body className="bg-[var(--background)] text-[var(--on-background)] font-sans antialiased min-h-screen">
+        <ThemeProvider>
+          <MainLayout>
+            {children}
+            <Toaster position="top-right" toastOptions={{
+              style: {
+                background: 'var(--surface-container-high)',
+                color: 'var(--on-surface)',
+                borderRadius: '16px',
+                fontSize: '14px',
+                fontWeight: '500',
+              },
+              success: { iconTheme: { primary: 'var(--success)', secondary: 'var(--on-success)' } },
+              error: { iconTheme: { primary: 'var(--error)', secondary: 'var(--on-error)' } }
+            }} />
+          </MainLayout>
+        </ThemeProvider>
       </body>
     </html>
   );

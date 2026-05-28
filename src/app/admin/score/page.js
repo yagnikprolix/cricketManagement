@@ -2,6 +2,12 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import toast from 'react-hot-toast';
+import AppBar from '@/components/ui/AppBar';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Loader from '@/components/ui/Loader';
+import { ArrowLeft } from 'lucide-react';
 
 // Dynamic Commentary Generator Helper
 const generateCommentarySentence = ({ strikerName, nonStrikerName, bowlerName, runs, type, extraType, dismissalType, dismissedName, fielderName }) => {
@@ -126,14 +132,12 @@ function ScoreConsoleContent() {
   const [whoIsOut, setWhoIsOut] = useState('striker'); // striker, nonStriker
   const [fielderId, setFielderId] = useState('');
 
-  // Feedbacks
-  const [toastMsg, setToastMsg] = useState('');
-  const [toastType, setToastType] = useState('success');
-
   const showToast = (msg, type = 'success') => {
-    setToastMsg(msg);
-    setToastType(type);
-    setTimeout(() => setToastMsg(''), 4500);
+    if (type === 'error') {
+      toast.error(msg);
+    } else {
+      toast.success(msg);
+    }
   };
 
   const fetchScorerData = async () => {
@@ -583,69 +587,45 @@ function ScoreConsoleContent() {
   };
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-          <div className="loading-spinner" />
-          <p style={{ fontFamily: 'var(--font-outfit)', fontSize: '16px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Loading Scoring Deck...</p>
-        </div>
-      </div>
-    );
+    return <Loader text="Loading Scoring Deck..." fullScreen />;
   }
 
   // Dashboard Match Selector if no matchId is specified
   if (!matchId) {
     const liveAndUpcoming = matches.filter(m => m.scorecard?.status !== 'completed');
     return (
-      <div style={{ background: '#060913', minHeight: '100vh', color: 'var(--text-main)' }}>
-        <nav className="navbar">
-          <div className="nav-brand">
-            <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Scoring Cockpit
-          </div>
-          <div className="nav-links">
-            <button onClick={() => router.push('/admin')} className="btn btn-secondary">Back to command center</button>
-          </div>
-        </nav>
-
-        <main className="main-wrapper" style={{ paddingTop: '100px' }}>
-          <div className="glass-card p-30 text-center" style={{ maxWidth: '700px', margin: '0 auto' }}>
-            <h2 style={{ color: 'white', fontSize: '28px', marginBottom: '10px' }}>Select Live Match to Score</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
+      <div className="min-h-screen bg-[var(--background)] pb-24">
+        <AppBar 
+          title="Scoring Cockpit" 
+          leading={<IconButton icon={ArrowLeft} onClick={() => router.push('/admin')} />} 
+        />
+        <main className="w-full max-w-[800px] mx-auto px-4 mt-6 md:mt-10">
+          <div className="bg-[var(--surface-container-low)] p-6 md:p-10 text-center rounded-[32px] shadow-[var(--el-1)]">
+            <h2 className="text-[28px] text-[var(--on-surface)] mb-2 font-medium">Select Live Match to Score</h2>
+            <p className="text-[var(--on-surface-variant)] text-[15px] mb-8">
               Choose a match from the active scheduling roster below to initiate Cricbuzz-style live scorecast updates.
             </p>
 
             {liveAndUpcoming.length === 0 ? (
-              <div style={{ padding: '30px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              <div className="p-8 text-[var(--on-surface-variant)] italic bg-[var(--surface-container-highest)] rounded-2xl">
                 No active or scheduled matches found. Go schedule one first!
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }}>
+              <div className="flex flex-col gap-4 text-left">
                 {liveAndUpcoming.map(m => (
-                  <div key={m._id} style={{
-                    padding: '20px',
-                    borderRadius: '12px',
-                    border: '1px solid var(--card-border)',
-                    background: 'rgba(255,255,255,0.02)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
+                  <div key={m._id} className="p-5 rounded-2xl bg-[var(--surface-container-highest)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-[var(--surface-container)] transition-colors">
                     <div>
-                      <h3 style={{ color: 'white', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <h3 className="text-[18px] text-[var(--on-surface)] font-medium flex items-center gap-2">
                         {m.title}
-                        {m.scorecard?.status === 'live' && <span className="live-badge-pulse" style={{ fontSize: '9px', padding: '2px 6px' }}>Live</span>}
+                        {m.scorecard?.status === 'live' && <span className="shrink-0 bg-[var(--live)] text-[var(--on-live)] text-[10px] font-bold px-2 py-0.5 rounded-full">Live</span>}
                       </h3>
-                      <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        📍 {m.location} | ⏰ {m.time} | 📅 {new Date(m.date).toLocaleDateString()}
+                      <p className="text-[13px] text-[var(--on-surface-variant)] mt-1">
+                        Location: {m.location} | Time: {m.time}
                       </p>
                     </div>
-                    <button
-                      onClick={() => router.push(`/admin/score?matchId=${m._id}`)}
-                      className="btn btn-primary"
-                      style={{ padding: '10px 20px', background: 'linear-gradient(135deg, var(--color-primary) 0%, #059669 100%)' }}
-                    >
-                      🎤 Score Match
-                    </button>
+                    <Button variant="filled" onClick={() => router.push(`/admin/score?matchId=${m._id}`)}>
+                      Score Match
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -657,60 +637,43 @@ function ScoreConsoleContent() {
   }
 
   return (
-    <div style={{ background: '#060913', minHeight: '100vh', color: 'var(--text-main)' }}>
-      
-      {/* Toast Alert Indicator */}
-      {toastMsg && (
-        <div className={`toast-notification ${toastType === 'success' ? 'toast-success' : 'toast-error'}`}>
-          {toastType === 'success' ? '✓' : '⚠️'} {toastMsg}
-        </div>
-      )}
+    <div className="min-h-screen bg-[var(--background)] pb-24">
 
-      <nav className="navbar">
-        <div className="nav-brand">
-          <img src="/curius-logo.png" alt="Curius" style={{ width: '28px', height: '28px', borderRadius: '6px' }} /> Umpiring Scoring Center
-        </div>
-        <div className="nav-links">
-          <button onClick={() => router.push('/admin')} className="btn btn-secondary">Command center</button>
-          <button onClick={() => router.push('/live')} className="btn btn-primary" style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' }}>📺 Live Player View</button>
-        </div>
-      </nav>
+      <AppBar 
+        title="Umpiring Scoring Center"
+        leading={<IconButton icon={ArrowLeft} onClick={() => router.push('/admin')} />}
+        actions={
+          <div className="pr-2">
+            <Button variant="filled" size="sm" onClick={() => router.push('/live')}>
+              Live Player View
+            </Button>
+          </div>
+        }
+      />
 
-      <main className="main-wrapper" style={{ paddingTop: '100px' }}>
+      <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8 mt-6 md:mt-10">
         
         {selectedMatch && (
-          <div className="glass-card p-30 mb-30" style={{ border: '1px solid rgba(16, 185, 129, 0.3)', position: 'relative' }}>
+          <div className="bg-[var(--surface-container-low)] p-6 md:p-8 rounded-[32px] shadow-[var(--el-1)] mb-8 relative">
             
             {/* Wicket Out Form Modal Overlay */}
             {showWicketForm && (
-              <div style={{
-                position: 'absolute',
-                top: 0, left: 0, right: 0, bottom: 0,
-                background: 'rgba(9, 13, 22, 0.96)',
-                borderRadius: '16px',
-                zIndex: 100,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '30px'
-              }}>
-                <div className="glass-card p-30" style={{ width: '100%', maxWidth: '480px', border: '1px solid var(--color-danger)' }}>
-                  <h3 style={{ fontSize: '22px', color: 'var(--color-danger)', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    🔴 Dismissal Form
-                  </h3>
+              <div className="absolute inset-0 bg-[var(--surface-container-high)]/95 backdrop-blur-sm rounded-[32px] z-10 flex flex-col justify-center items-center p-6">
+                <div className="w-full max-w-md bg-[var(--surface-container-low)] p-6 rounded-2xl shadow-[var(--el-3)] overflow-y-auto max-h-full no-scrollbar">
+                  <h3 className="text-[22px] text-[var(--error)] font-medium mb-6">Dismissal Form</h3>
                   
-                  <form onSubmit={handleWicketSubmit}>
-                    <div className="form-group">
-                      <label className="form-label">Who is OUT?</label>
-                      <select className="form-input" value={whoIsOut} onChange={(e) => setWhoIsOut(e.target.value)}>
+                  <form onSubmit={handleWicketSubmit} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[15px] text-[var(--on-surface-variant)]">Who is OUT?</label>
+                      <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={whoIsOut} onChange={(e) => setWhoIsOut(e.target.value)}>
                         <option value="striker">Striker: {activeStriker?.name || 'Empty'}</option>
                         <option value="nonStriker">Non-Striker: {activeNonStriker?.name || 'Empty'}</option>
                       </select>
                     </div>
 
-                    <div className="form-group">
-                      <label className="form-label">Dismissal Type</label>
-                      <select className="form-input" value={dismissedType} onChange={(e) => setDismissedType(e.target.value)}>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[15px] text-[var(--on-surface-variant)]">Dismissal Type</label>
+                      <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={dismissedType} onChange={(e) => setDismissedType(e.target.value)}>
                         <option value="Caught">Caught</option>
                         <option value="Bowled">Bowled</option>
                         <option value="LBW">LBW</option>
@@ -720,9 +683,9 @@ function ScoreConsoleContent() {
                     </div>
 
                     {['Caught', 'Run Out', 'Stumped'].includes(dismissedType) && (
-                      <div className="form-group">
-                        <label className="form-label">Fielder Involved</label>
-                        <select className="form-input" value={fielderId} onChange={(e) => setFielderId(e.target.value)} required>
+                      <div className="flex flex-col gap-2">
+                        <label className="text-[15px] text-[var(--on-surface-variant)]">Fielder Involved</label>
+                        <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={fielderId} onChange={(e) => setFielderId(e.target.value)} required>
                           <option value="">-- Select Fielder --</option>
                           {yesAttendees.map(p => (
                             <option key={p.userId} value={p.userId}>{p.name}</option>
@@ -731,74 +694,80 @@ function ScoreConsoleContent() {
                       </div>
                     )}
 
-                    <div className="gap-12 mt-20">
-                      <button type="submit" className="btn btn-danger" style={{ flex: 1 }}>Confirm OUT</button>
-                      <button type="button" onClick={() => setShowWicketForm(false)} className="btn btn-secondary">Cancel</button>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <Button type="submit" variant="outlined" className="!text-[var(--error)] !border-[var(--error)]">
+                        Confirm OUT
+                      </Button>
+                      <Button type="button" onClick={() => setShowWicketForm(false)} variant="tonal">
+                        Cancel
+                      </Button>
                     </div>
                   </form>
                 </div>
               </div>
             )}
 
-            <div className="flex-between" style={{ borderBottom: '1px solid var(--card-border)', paddingBottom: '15px', marginBottom: '20px' }}>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-6 border-b border-[var(--outline)]">
               <div>
-                <h2 style={{ fontSize: '24px', color: 'white' }}>Active Match: <span style={{ color: 'var(--color-primary)' }}>{selectedMatch.title}</span></h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '4px' }}>📍 {selectedMatch.location} | Umpiring Dashboard</p>
+                <h2 className="text-[24px] text-[var(--on-surface)]">Active Match: <span className="text-[var(--primary)]">{selectedMatch.title}</span></h2>
+                <p className="text-[var(--on-surface-variant)] text-[14px] mt-1">Location: {selectedMatch.location} | Umpiring Dashboard</p>
               </div>
-              {scoreStatus === 'live' ? (
-                <span className="live-badge-pulse" style={{ padding: '6px 12px', fontSize: '12px' }}>Live Scoring Active</span>
-              ) : (
-                <span className="user-badge" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>Status: {scoreStatus}</span>
-              )}
+              <div className="mt-4 md:mt-0">
+                {scoreStatus === 'live' ? (
+                  <span className="bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30 px-4 py-2 rounded-full text-[13px] font-medium ">Live Scoring Active</span>
+                ) : (
+                  <span className="bg-[var(--surface-container-highest)] text-[var(--on-surface-variant)] px-4 py-2 rounded-full text-[13px] font-medium ">Status: {scoreStatus}</span>
+                )}
+              </div>
             </div>
 
-            <div className="grid-2" style={{ gap: '30px' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
               {/* Umpiring Settings Panel */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <form onSubmit={handleMetadataSubmit} style={{ background: 'rgba(0,0,0,0.15)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-                  <h3 style={{ fontSize: '15px', color: 'white', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>Scorecard parameters</h3>
+              <div className="flex flex-col gap-6">
+                <form onSubmit={handleMetadataSubmit} className="bg-[var(--surface-container)] p-6 rounded-2xl flex flex-col gap-4">
+                  <h3 className="text-[15px] text-[var(--on-surface)]">Scorecard parameters</h3>
                   
-                  <div className="grid-2" style={{ gap: '15px', marginBottom: '0' }}>
-                    <div className="form-group">
-                      <label className="form-label" style={{ fontSize: '12px' }}>Batting Team</label>
-                      <input type="text" className="form-input" value={battingTeam} onChange={(e) => setBattingTeam(e.target.value)} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[14px] text-[var(--on-surface-variant)]">Batting Team</label>
+                      <input type="text" className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={battingTeam} onChange={(e) => setBattingTeam(e.target.value)} />
                     </div>
-                    <div className="form-group">
-                      <label className="form-label" style={{ fontSize: '12px' }}>Bowling Team</label>
-                      <input type="text" className="form-input" value={bowlingTeam} onChange={(e) => setBowlingTeam(e.target.value)} />
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[14px] text-[var(--on-surface-variant)]">Bowling Team</label>
+                      <input type="text" className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={bowlingTeam} onChange={(e) => setBowlingTeam(e.target.value)} />
                     </div>
                   </div>
 
-                  <div className="grid-2" style={{ gap: '15px', marginBottom: '0' }}>
-                    <div className="form-group">
-                      <label className="form-label" style={{ fontSize: '12px' }}>Target (Runs)</label>
-                      <input type="number" className="form-input" value={target} onChange={(e) => setTarget(e.target.value)} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[14px] text-[var(--on-surface-variant)]">Target (Runs)</label>
+                      <input type="number" className="w-full h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={target} onChange={(e) => setTarget(e.target.value)} />
                     </div>
-                    <div className="form-group">
-                      <label className="form-label" style={{ fontSize: '12px' }}>Scoring Status</label>
-                      <select className="form-input" value={scoreStatus} onChange={(e) => setScoreStatus(e.target.value)} style={{ background: '#0b0f19' }}>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[14px] text-[var(--on-surface-variant)]">Scoring Status</label>
+                      <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={scoreStatus} onChange={(e) => setScoreStatus(e.target.value)}>
                         <option value="scheduled">Scheduled (Upcoming)</option>
-                        <option value="live">🟢 Live Scoring Active</option>
-                        <option value="completed">🏁 Completed</option>
+                        <option value="live">Live Scoring Active</option>
+                        <option value="completed">Completed</option>
                       </select>
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn-secondary" style={{ width: '100%', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', background: 'none' }}>
-                    ✓ Update Teams & Status
-                  </button>
+                  <Button type="submit" variant="outlined" full>
+                    Update Teams & Status
+                  </Button>
                 </form>
 
                 {/* Active Batter & Bowler Selector */}
-                <div style={{ background: 'rgba(0,0,0,0.15)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  <h3 style={{ fontSize: '14px', color: 'white', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>
+                <div className="bg-[var(--surface-container)] p-6 rounded-2xl flex flex-col gap-4">
+                  <h3 className="text-[15px] text-[var(--on-surface)]">
                     Active Batsmen & Bowler (from RSVP Yes)
                   </h3>
                   
-                  <div className="form-group" style={{ marginBottom: '0' }}>
-                    <label className="form-label" style={{ fontSize: '12px' }}>🏏 Striker (On Strike)</label>
-                    <select className="form-input" value={strikerId} onChange={(e) => handleActivePlayerSelect('striker', e.target.value)} style={{ background: '#0b0f19' }}>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[14px] text-[var(--on-surface-variant)]">Striker (On Strike)</label>
+                    <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={strikerId} onChange={(e) => handleActivePlayerSelect('striker', e.target.value)}>
                       <option value="">-- Select Striker --</option>
                       {yesAttendees.map(p => (
                         <option key={p.userId} value={p.userId} disabled={p.userId === nonStrikerId}>{p.name}</option>
@@ -806,9 +775,9 @@ function ScoreConsoleContent() {
                     </select>
                   </div>
 
-                  <div className="form-group" style={{ marginBottom: '0' }}>
-                    <label className="form-label" style={{ fontSize: '12px' }}>🏏 Non-Striker</label>
-                    <select className="form-input" value={nonStrikerId} onChange={(e) => handleActivePlayerSelect('nonStriker', e.target.value)} style={{ background: '#0b0f19' }}>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[14px] text-[var(--on-surface-variant)]">Non-Striker</label>
+                    <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={nonStrikerId} onChange={(e) => handleActivePlayerSelect('nonStriker', e.target.value)}>
                       <option value="">-- Select Non-Striker --</option>
                       {yesAttendees.map(p => (
                         <option key={p.userId} value={p.userId} disabled={p.userId === strikerId}>{p.name}</option>
@@ -816,9 +785,9 @@ function ScoreConsoleContent() {
                     </select>
                   </div>
 
-                  <div className="form-group" style={{ marginBottom: '0' }}>
-                    <label className="form-label" style={{ fontSize: '12px' }}>🔴 Bowler</label>
-                    <select className="form-input" value={bowlerId} onChange={(e) => handleActivePlayerSelect('bowler', e.target.value)} style={{ background: '#0b0f19' }}>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[14px] text-[var(--on-surface-variant)]">Bowler</label>
+                    <select className="appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238E8E93%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[position:right_1rem_center] bg-no-repeat w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all" value={bowlerId} onChange={(e) => handleActivePlayerSelect('bowler', e.target.value)}>
                       <option value="">-- Select Bowler --</option>
                       {yesAttendees.map(p => (
                         <option key={p.userId} value={p.userId}>{p.name}</option>
@@ -830,77 +799,70 @@ function ScoreConsoleContent() {
               </div>
 
               {/* Digital Scoreboard & scoring grid */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="flex flex-col gap-6">
                 
-                <div className="scoreboard-display" style={{ padding: '24px', background: 'linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(0,0,0,0.3) 100%)', border: '1px solid rgba(16,185,129,0.2)' }}>
-                  <div className="flex-between">
-                    <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <div className="p-6 rounded-2xl bg-[var(--surface-container)]">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[14px] font-medium text-[var(--primary)]">
                       BAT: {battingTeam}
                     </span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>BOWLING: {bowlingTeam}</span>
+                    <span className="text-[12px] text-[var(--on-surface-variant)]">BOWLING: {bowlingTeam}</span>
                   </div>
                   
-                  <div className="score-main" style={{ fontSize: '48px', fontWeight: '800', margin: '10px 0', textShadow: '0 0 15px rgba(16,185,129,0.2)' }}>
-                    {runs} / {wickets}
+                  <div className="text-[48px] text-[var(--on-surface)] font-bold leading-tight mb-2 tracking-wide">
+                    {runs} <span className="text-[var(--on-surface-variant)] text-[36px] font-medium mx-1">/</span> {wickets}
                   </div>
 
-                  <div className="score-sub" style={{ fontSize: '15px' }}>
-                    Overs: <strong style={{ color: 'white', fontSize: '18px' }}>{overs}.{balls}</strong>
-                    {target > 0 && <span style={{ marginLeft: '15px' }}>🎯 Target: {target}</span>}
+                  <div className="text-[15px] text-[var(--on-surface-variant)]">
+                    Overs: <strong className="text-[var(--on-surface)] text-[18px]">{overs}.{balls}</strong>
+                    {target > 0 && <span className="ml-4">Target: {target}</span>}
                   </div>
                 </div>
 
-                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--card-border)', borderRadius: '10px', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div>🏏 On Strike: <strong>{activeStriker?.name ? `${activeStriker.name} ${activeStriker.runs}* (${activeStriker.balls}b) [${activeStriker.fours}x4, ${activeStriker.sixes}x6]` : 'Select Striker'}</strong></div>
-                  <div>🏏 Non-Strike: <strong>{activeNonStriker?.name ? `${activeNonStriker.name} ${activeNonStriker.runs} (${activeNonStriker.balls}b)` : 'Select Non-Striker'}</strong></div>
-                  <div>🔴 Bowler: <strong>{activeBowler?.name ? `${activeBowler.name} ${activeBowler.wickets}/${activeBowler.runsConceded} (${activeBowler.overs}.${activeBowler.balls} ov)` : 'Select Bowler'}</strong></div>
+                <div className="p-4 rounded-2xl bg-[var(--surface-container)] text-[13px] flex flex-col gap-2 text-[var(--on-surface-variant)]">
+                  <div>Striker: <strong className="text-[var(--on-surface)]">{activeStriker?.name ? `${activeStriker.name} ${activeStriker.runs}* (${activeStriker.balls}b) [${activeStriker.fours}x4, ${activeStriker.sixes}x6]` : 'Select Striker'}</strong></div>
+                  <div>Non-Strike: <strong className="text-[var(--on-surface)]">{activeNonStriker?.name ? `${activeNonStriker.name} ${activeNonStriker.runs} (${activeNonStriker.balls}b)` : 'Select Non-Striker'}</strong></div>
+                  <div>Bowler: <strong className="text-[var(--on-surface)]">{activeBowler?.name ? `${activeBowler.name} ${activeBowler.wickets}/${activeBowler.runsConceded} (${activeBowler.overs}.${activeBowler.balls} ov)` : 'Select Bowler'}</strong></div>
                 </div>
 
                 {/* Score Increment Grid */}
-                <div className="scoring-grid">
-                  <button onClick={() => handleScoreChange('runs', 0)} className="scoring-btn">0 (Dot)</button>
-                  <button onClick={() => handleScoreChange('runs', 1)} className="scoring-btn">+1 Run</button>
-                  <button onClick={() => handleScoreChange('runs', 2)} className="scoring-btn">+2 Runs</button>
-                  <button onClick={() => handleScoreChange('runs', 3)} className="scoring-btn">+3 Runs</button>
+                <div className="grid grid-cols-4 gap-3">
+                  <Button variant="tonal" onClick={() => handleScoreChange('runs', 0)} className="py-4 px-2 w-full text-[16px] font-medium">0</Button>
+                  <Button variant="tonal" onClick={() => handleScoreChange('runs', 1)} className="py-4 px-2 w-full text-[16px] font-medium">1</Button>
+                  <Button variant="tonal" onClick={() => handleScoreChange('runs', 2)} className="py-4 px-2 w-full text-[16px] font-medium">2</Button>
+                  <Button variant="tonal" onClick={() => handleScoreChange('runs', 3)} className="py-4 px-2 w-full text-[16px] font-medium">3</Button>
                   
-                  <button onClick={() => handleScoreChange('runs', 4)} className="scoring-btn scoring-btn-accent">+4 Four</button>
-                  <button onClick={() => handleScoreChange('runs', 6)} className="scoring-btn scoring-btn-accent">+6 Six</button>
-                  <button onClick={() => handleScoreChange('extras', 'Wide')} className="scoring-btn">Wide (+1)</button>
-                  <button onClick={() => handleScoreChange('extras', 'No Ball')} className="scoring-btn">No Ball (+1)</button>
+                  <Button variant="filled" onClick={() => handleScoreChange('runs', 4)} className="py-4 px-2 w-full text-[16px] font-bold">4</Button>
+                  <Button variant="filled" onClick={() => handleScoreChange('runs', 6)} className="py-4 px-2 w-full text-[16px] font-bold">6</Button>
+                  <Button variant="tonal" onClick={() => handleScoreChange('extras', 'Wide')} className="py-4 px-2 w-full text-[14px]">Wide</Button>
+                  <Button variant="tonal" onClick={() => handleScoreChange('extras', 'No Ball')} className="py-4 px-2 w-full text-[14px]">No Ball</Button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button
-                    onClick={() => setShowWicketForm(true)}
-                    className="btn btn-danger"
-                    style={{ flex: 1, padding: '12px', fontWeight: '800', background: 'linear-gradient(135deg, var(--color-danger) 0%, #b91c1c 100%)' }}
-                  >
-                    🔴 OUT / Dismissal
-                  </button>
-                </div>
+                <Button variant="filled" onClick={() => setShowWicketForm(true)} className="!bg-[var(--error)] !text-[var(--on-error)] py-4 font-medium" full>
+                  OUT / Dismissal
+                </Button>
 
                 {/* Custom commentary logger */}
-                <form onSubmit={handleCustomCommentary} style={{ display: 'flex', gap: '8px' }}>
+                <form onSubmit={handleCustomCommentary} className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Log custom commentary overrides..."
-                    className="form-input"
-                    style={{ flex: 1, padding: '10px 14px', fontSize: '13px' }}
+                    className="flex-1 h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border-transparent text-[15px] text-[var(--on-surface)] focus:outline-none focus:border-[var(--on-surface-variant)] focus:ring-1 focus:ring-[var(--on-surface-variant)] transition-all"
                     value={commentaryText}
                     onChange={(e) => setCommentaryText(e.target.value)}
                   />
-                  <button type="submit" className="btn btn-primary" style={{ padding: '10px 18px', fontSize: '12px' }}>
+                  <Button type="submit" variant="filled">
                     Log Ball
-                  </button>
+                  </Button>
                 </form>
 
-                <div className="flex-between">
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                <div className="flex justify-between items-center mt-4">
+                  <span className="text-[12px] text-[var(--on-surface-variant)] italic">
                     * Batsmen are auto-rotated on odd singles and at the end of every over.
                   </span>
-                  <button onClick={handleResetScorecard} className="btn btn-danger" style={{ padding: '6px 12px', fontSize: '10px', background: 'none', border: '1px solid var(--color-danger)', color: 'var(--color-danger)', boxShadow: 'none' }}>
+                  <Button variant="outlined" size="sm" onClick={handleResetScorecard} className="!text-[var(--error)] !border-[var(--error)] shrink-0">
                     Reset Scorecard
-                  </button>
+                  </Button>
                 </div>
 
               </div>
@@ -917,11 +879,7 @@ function ScoreConsoleContent() {
 
 export default function DedicatedScorerConsole() {
   return (
-    <Suspense fallback={
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#060913', color: 'var(--text-main)' }}>
-        <p>Loading Console components...</p>
-      </div>
-    }>
+    <Suspense fallback={<Loader text="Loading Console components..." fullScreen />}>
       <ScoreConsoleContent />
     </Suspense>
   );

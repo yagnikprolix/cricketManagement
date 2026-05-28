@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from '@/components/ui/Button';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,51 +76,46 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="glass-card login-card">
+    <div className="min-h-screen bg-[var(--background)] flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-[480px] bg-[var(--surface-container-low)] rounded-[32px] p-8 md:p-10 shadow-[var(--el-2)]">
         
-        {/* Logo & Brand Section */}
-        <div className="login-logo-section">
-          <div className="login-logo-icon">
-            <img src="/curius-logo.png" alt="Curius Cricket Club" />
+        {/* Logo & Brand */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="w-16 h-16 bg-[var(--primary-container)] text-[var(--on-primary-container)] rounded-full flex items-center justify-center mb-4">
+            <span className="text-2xl font-black italic">C</span>
           </div>
-          <h1 className="login-brand-name">CURIUS</h1>
-          <p className="login-tagline">
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--on-surface)] mb-2">Curius Cricket</h1>
+          <p className="text-[15px] text-[var(--on-surface-variant)] leading-relaxed">
             {isRegister ? 'Create your account to join the squad' : 'Sign in to your cricket club portal'}
           </p>
-          <div className="login-divider" />
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="login-alert login-alert-error">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
-            </svg>
+          <div className="mb-6 p-4 rounded-2xl bg-[var(--error-container)] text-[var(--on-error-container)] flex items-center gap-3 text-sm font-medium">
+            <div className="w-1.5 h-1.5 rounded-full bg-[var(--error)] shrink-0" />
             {error}
           </div>
         )}
 
         {/* Success Alert */}
         {success && (
-          <div className="login-alert login-alert-success">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
+          <div className="mb-6 p-4 rounded-2xl bg-[var(--success-container)] text-[var(--on-success-container)] flex items-center gap-3 text-sm font-medium">
+            <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)] shrink-0" />
             {success}
           </div>
         )}
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit}>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {isRegister && (
-            <div className="form-group">
-              <label className="form-label" htmlFor="login-name">Full Name</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-bold text-[var(--on-surface)] uppercase tracking-wider" htmlFor="login-name">Full Name</label>
               <input
                 id="login-name"
                 type="text"
                 placeholder="Enter your name"
-                className="form-input"
+                className="h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border border-[var(--outline-variant)] text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -127,13 +124,13 @@ export default function LoginPage() {
             </div>
           )}
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="login-email">Email Address</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-[13px] font-bold text-[var(--on-surface)] uppercase tracking-wider" htmlFor="login-email">Email Address</label>
             <input
               id="login-email"
               type="email"
               placeholder="name@example.com"
-              className="form-input"
+              className="h-[52px] px-4 rounded-2xl bg-[var(--surface-container-highest)] border border-[var(--outline-variant)] text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -141,15 +138,14 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="form-group" style={{ marginBottom: '28px' }}>
-            <label className="form-label" htmlFor="login-password">Password</label>
-            <div style={{ position: 'relative' }}>
+          <div className="flex flex-col gap-2 mb-2">
+            <label className="text-[13px] font-bold text-[var(--on-surface)] uppercase tracking-wider" htmlFor="login-password">Password</label>
+            <div className="relative">
               <input
                 id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
-                className="form-input"
-                style={{ width: '100%', paddingRight: '44px' }}
+                className="w-full h-[52px] pl-4 pr-12 rounded-2xl bg-[var(--surface-container-highest)] border border-[var(--outline-variant)] text-[15px] text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -158,73 +154,36 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  transition: 'color 0.2s ease',
-                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-[var(--on-surface-variant)] hover:text-[var(--on-surface)] transition-colors rounded-full"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                    <line x1="1" y1="1" x2="23" y2="23"/>
-                  </svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                )}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%', padding: '12px 24px', fontSize: '15px' }} 
+          <Button
+            type="submit"
+            size="lg"
+            full
             disabled={loading}
-            id="login-submit-btn"
           >
-            {loading ? (
-              <>
-                <span className="loading-spinner" style={{ width: '18px', height: '18px', borderWidth: '2px' }} />
-                Processing...
-              </>
-            ) : isRegister ? 'Create Account' : 'Sign In'}
-          </button>
+            {loading ? 'Processing…' : isRegister ? 'Create Account' : 'Sign In'}
+          </Button>
         </form>
 
-        {/* Toggle Register/Login */}
-        <div className="login-footer">
+        {/* Toggle */}
+        <div className="mt-8 text-center text-[14px] text-[var(--on-surface-variant)]">
           {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
-            onClick={() => {
-              setIsRegister(!isRegister);
-              setError('');
-              setSuccess('');
-            }}
-            className="login-footer-toggle"
+            onClick={() => { setIsRegister(!isRegister); setError(''); setSuccess(''); }}
+            className="font-bold text-[var(--primary)] hover:underline ml-1"
           >
             {isRegister ? 'Sign in here' : 'Create account'}
           </button>
         </div>
 
-        {/* Powered By */}
-        <p className="login-powered">
-          Powered by Curius Cricket Club Management
-        </p>
-
+        <p className="mt-8 text-center text-[12px] text-[var(--outline)] font-medium">Powered by Curius Cricket Club</p>
       </div>
     </div>
   );

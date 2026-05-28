@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
@@ -57,13 +58,14 @@ export default function AdminDashboard() {
   // Status indicators
   const [formLoading, setFormLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
-  const [toastMsg, setToastMsg] = useState('');
-  const [toastType, setToastType] = useState('success'); 
-
   const showToast = (msg, type = 'success') => {
-    setToastMsg(msg);
-    setToastType(type);
-    setTimeout(() => setToastMsg(''), 4000);
+    if (type === 'error') {
+      toast.error(msg);
+    } else if (type === 'info') {
+      toast(msg, { icon: 'ℹ️' });
+    } else {
+      toast.success(msg);
+    }
   };
 
   const fetchAdminData = async () => {
@@ -700,12 +702,6 @@ export default function AdminDashboard() {
       />
 
       <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8 lg:px-12 mt-6 md:mt-10">
-        {toastMsg && (
-          <div className={`toast-notification ${toastType === 'success' ? 'toast-success' : toastType === 'error' ? 'toast-error' : 'toast-info'}`}>
-            {toastMsg}
-          </div>
-        )}
-
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 mt-6">
           
           {/* Match Form */}

@@ -1,8 +1,7 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
-import { Trophy, Search, CreditCard, Moon, Sun, Smile } from 'lucide-react';
+import { Trophy, Search, CreditCard, Smile } from 'lucide-react';
 import clsx from 'clsx';
-import { useTheme } from '@/components/theme/ThemeProvider';
 
 const ITEMS = [
   { id: 'matches', label: 'Matches',  href: '/',         icon: Trophy },
@@ -14,7 +13,6 @@ const ITEMS = [
 export default function SideNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, toggle } = useTheme();
 
   if (!pathname || pathname === '/login') return null;
 
@@ -54,22 +52,6 @@ export default function SideNav() {
           );
         })}
       </nav>
-
-      {/* User & Theme */}
-      <div className="mt-auto pt-4 flex items-center justify-between px-2">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full bg-[var(--success)] text-[var(--on-success)] flex items-center justify-center font-bold text-[13px]">
-            VB
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="text-[13px] font-bold text-[var(--on-surface)] leading-tight">Vasu Bhalodia</span>
-            <span className="text-[10px] text-[var(--on-surface-variant)] uppercase tracking-wider font-semibold">All-rounder</span>
-          </div>
-        </div>
-        <button onClick={toggle} className="p-2 rounded-full text-[var(--on-surface-variant)] hover:bg-[var(--surface-container-low)] transition-colors">
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-      </div>
     </aside>
     </div>
   );

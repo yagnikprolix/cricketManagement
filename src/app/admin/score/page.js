@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
@@ -130,14 +131,12 @@ function ScoreConsoleContent() {
   const [whoIsOut, setWhoIsOut] = useState('striker'); // striker, nonStriker
   const [fielderId, setFielderId] = useState('');
 
-  // Feedbacks
-  const [toastMsg, setToastMsg] = useState('');
-  const [toastType, setToastType] = useState('success');
-
   const showToast = (msg, type = 'success') => {
-    setToastMsg(msg);
-    setToastType(type);
-    setTimeout(() => setToastMsg(''), 4500);
+    if (type === 'error') {
+      toast.error(msg);
+    } else {
+      toast.success(msg);
+    }
   };
 
   const fetchScorerData = async () => {
@@ -645,12 +644,6 @@ function ScoreConsoleContent() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] pb-24">
-      {/* Toast Alert Indicator */}
-      {toastMsg && (
-        <div className={`toast-notification ${toastType === 'success' ? 'toast-success' : 'toast-error'}`}>
-          {toastMsg}
-        </div>
-      )}
 
       <AppBar 
         title="Umpiring Scoring Center"

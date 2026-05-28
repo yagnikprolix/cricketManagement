@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import BottomNav from '@/components/ui/BottomNav';
 import SideNav from '@/components/ui/SideNav';
 import MainLayout from '@/components/layout/MainLayout';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: 'Curius Cricket Club | Live Matches, RSVP & Payments',
@@ -61,6 +62,17 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <MainLayout>
             {children}
+            <Toaster position="top-right" toastOptions={{
+              style: {
+                background: 'var(--surface-container-high)',
+                color: 'var(--on-surface)',
+                borderRadius: '16px',
+                fontSize: '14px',
+                fontWeight: '500',
+              },
+              success: { iconTheme: { primary: 'var(--success)', secondary: 'var(--on-success)' } },
+              error: { iconTheme: { primary: 'var(--error)', secondary: 'var(--on-error)' } }
+            }} />
           </MainLayout>
         </ThemeProvider>
       </body>

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import AppBar from '@/components/ui/AppBar';
 import Tabs from '@/components/ui/Tabs';
 import GroundArt from '@/components/ui/GroundArt';
@@ -83,8 +84,9 @@ export default function MatchDetailPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setMatch(data.match);
+      toast.success('RSVP updated successfully');
     } catch (error) {
-      alert(error.message || 'Failed to update RSVP');
+      toast.error(error.message || 'Failed to update RSVP');
     } finally {
       setRsvpLoading(false);
     }
@@ -272,10 +274,11 @@ export default function MatchDetailPage() {
               )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 md:justify-end">
               <Button
-                variant={userRsvp === 'yes' ? 'success' : 'tonal'}
-                icon={Check} size="sm" full
+                variant={userRsvp === 'yes' ? 'success' : userRsvp === 'no' ? 'outlined' : 'tonal'}
+                icon={Check} size="sm"
+                className="flex-1 md:flex-none md:w-auto"
                 disabled={rsvpLoading}
                 onClick={() => handleRsvp('yes')}
               >
@@ -283,7 +286,8 @@ export default function MatchDetailPage() {
               </Button>
               <Button
                 variant={userRsvp === 'no' ? 'error' : 'outlined'}
-                icon={X} size="sm" full
+                icon={X} size="sm"
+                className="flex-1 md:flex-none md:w-auto"
                 disabled={rsvpLoading}
                 onClick={() => handleRsvp('no')}
               >

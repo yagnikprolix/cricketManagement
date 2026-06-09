@@ -45,6 +45,7 @@ export const metadata = {
     'theme-color': '#4F46E5',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'google-adsense-account': 'ca-pub-6485931326285001',
   },
 };
 

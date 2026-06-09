@@ -4,6 +4,7 @@ import BottomNav from '@/components/ui/BottomNav';
 import SideNav from '@/components/ui/SideNav';
 import MainLayout from '@/components/layout/MainLayout';
 import { Toaster } from 'react-hot-toast';
+import Script from 'next/script';
 
 export const metadata = {
   title: 'Curius Cricket Club | Live Matches, RSVP & Payments',
@@ -50,6 +51,8 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-6485931326285001';
+
   return (
     <html lang="en">
       <head>
@@ -71,6 +74,12 @@ export default function RootLayout({ children }) {
               })();
             `,
           }}
+        />
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
         />
       </head>
       <body className="bg-[var(--background)] text-[var(--on-background)] font-sans antialiased min-h-screen">

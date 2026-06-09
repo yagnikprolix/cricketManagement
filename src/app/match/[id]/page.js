@@ -11,6 +11,7 @@ import Chip from '@/components/ui/Chip';
 import { ArrowLeft, Share2, MoreVertical, Calendar, Clock, MapPin, IndianRupee, Users, Trophy, MessageSquare, ListChecks, Check, X, HelpCircle, Send, Volume2, CheckCircle, Info, Activity } from 'lucide-react';
 import clsx from 'clsx';
 import Loader from '@/components/ui/Loader';
+import GoogleAd from '@/components/ui/GoogleAd';
 
 export default function MatchDetailPage() {
   const router = useRouter();
@@ -297,6 +298,11 @@ export default function MatchDetailPage() {
                 Can't make it
               </Button>
             </div>
+          </div>
+
+          {/* Google Ads Section */}
+          <div className="mt-4">
+            <GoogleAd adSlot="match-detail-ad" />
           </div>
 
           {/* Secondary content — tabs */}

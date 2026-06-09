@@ -9,6 +9,7 @@ import MatchCard from '@/components/match/MatchCard';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import Loader from '@/components/ui/Loader';
 import { Plus } from 'lucide-react';
+import GoogleAd from '@/components/ui/GoogleAd';
 
 export default function PlayerDashboard() {
   const router = useRouter();
@@ -93,6 +94,11 @@ export default function PlayerDashboard() {
             <Chip key={id} selected={filter===id} onClick={() => setFilter(id)}>{l}</Chip>
           ))}
         </div>
+      </div>
+
+      {/* Google Ads Section */}
+      <div className="px-4 mb-4">
+        <GoogleAd adSlot="dashboard-top-ad" />
       </div>
 
       <div className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-8">

@@ -7,6 +7,7 @@ import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Loader from '@/components/ui/Loader';
+import LiveVideoStreamer from '@/components/ui/LiveVideoStreamer';
 import { ArrowLeft } from 'lucide-react';
 
 // Dynamic Commentary Generator Helper
@@ -759,6 +760,13 @@ function ScoreConsoleContent() {
       />
 
       <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8 mt-6 md:mt-10">
+
+        {/* Live Video Broadcasting Panel */}
+        {selectedMatch && matchId && (
+          <div className="mb-8">
+            <LiveVideoStreamer matchId={matchId} />
+          </div>
+        )}
         
         {selectedMatch && (
           <div className="bg-[var(--surface-container-low)] p-6 md:p-8 rounded-[32px] shadow-[var(--el-1)] mb-8 relative">

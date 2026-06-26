@@ -101,6 +101,7 @@ const ScorecardSchema = new mongoose.Schema({
   teamAPlayers: { type: [String], default: [] },
   teamBPlayers: { type: [String], default: [] },
   previousBowlerId: { type: String, default: '' },
+  liveVideoActive: { type: Boolean, default: false },
 });
 
 const MatchSchema = new mongoose.Schema({

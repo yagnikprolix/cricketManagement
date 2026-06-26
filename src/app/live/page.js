@@ -7,6 +7,7 @@ import Tabs from '@/components/ui/Tabs';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Loader from '@/components/ui/Loader';
+import LiveVideoViewer from '@/components/ui/LiveVideoViewer';
 import { ArrowLeft, Radio, Trophy, Activity, User, CircleDot, Mic, MicOff, MapPin, Table, LineChart, Target, Volume2, VolumeX } from 'lucide-react';
 
 function LiveStadiumContent() {
@@ -336,6 +337,12 @@ function LiveStadiumContent() {
           
           {/* Main Visual Scoreboard Panel */}
           <div className="flex flex-col gap-6">
+
+            {/* Live Video Player */}
+            <LiveVideoViewer
+              matchId={activeMatch._id}
+              isVideoActive={!!sc.liveVideoActive}
+            />
             
             <div className="bg-[var(--surface-container-high)] rounded-[32px] p-8 shadow-[var(--el-1)]">
               <div className="flex justify-between items-center border-b border-[var(--outline-variant)] pb-3 mb-5">
